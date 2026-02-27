@@ -1,0 +1,36 @@
+[project]
+name = "netsentinel-backend"
+version = "0.1.0"
+description = "NetSentinel - Network Monitoring & Intrusion Detection Platform"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    "pydantic-settings>=2.6.0",
+    "python-nmap>=0.7.1",
+    "scapy>=2.6.1",
+    "geoip2>=4.8.1",
+    "redis[hiredis]>=5.2.0",
+    "apscheduler>=3.10.4",
+    "websockets>=14.1",
+    "httpx>=0.28.0",
+    "python-dotenv>=1.0.1",
+    "python-multipart>=0.0.17",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+]
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
