@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NetSentinel – Network Security Monitor</title>
+  <meta name="description" content="Real-time network monitoring and intrusion detection platform built with FastAPI, Next.js, PostgreSQL, Redis & Docker." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #060d1a;
+      --surface:  #0d1a2e;
+      --card:     #0f2040;
+      --border:   #1a3a5c;
+      --primary:  #3b82f6;
+      --primary2: #60a5fa;
+      --green:    #22c55e;
+      --red:      #ef4444;
+      --orange:   #f97316;
+      --yellow:   #eab308;
+      --purple:   #8b5cf6;
+      --cyan:     #06b6d4;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(6,13,26,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; }
+    .nav-logo svg { width: 28px; height: 28px; color: var(--primary); }
+    .nav-logo span { font-weight: 700; font-size: 1.1rem; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-btn {
+      background: var(--primary); color: #fff; padding: 8px 18px;
+      border-radius: 8px; text-decoration: none; font-size: .85rem; font-weight: 600;
+      transition: opacity .2s;
+    }
+    .nav-btn:hover { opacity: .85; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 100px 24px 60px;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59,130,246,.25) 0%, transparent 70%);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.3);
+      color: var(--primary2); padding: 6px 14px; border-radius: 999px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .04em; margin-bottom: 24px;
+    }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 800; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, var(--primary2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem); color: var(--muted);
+      max-width: 600px; margin: 0 auto 36px;
+    }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: var(--primary); color: #fff; padding: 13px 28px;
+      border-radius: 10px; text-decoration: none; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 0 30px rgba(59,130,246,.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(59,130,246,.5); }
+    .btn-ghost {
+      background: transparent; color: var(--text); padding: 13px 28px;
+      border-radius: 10px; text-decoration: none; font-weight: 600;
+      border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+      transition: border-color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--primary); }
+
+    /* ── DASHBOARD MOCKUP ── */
+    .mockup-wrap {
+      width: 100%; max-width: 1100px; margin: 60px auto 0;
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .mockup-bar {
+      background: #0a1628; padding: 12px 18px;
+      display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
+    .mockup-url {
+      flex: 1; background: rgba(255,255,255,.06); border-radius: 6px;
+      padding: 5px 12px; font-family: var(--mono); font-size: .75rem; color: var(--muted);
+      margin: 0 12px; text-align: center;
+    }
+    .mockup-body {
+      background: var(--surface);
+      display: grid; grid-template-columns: 220px 1fr;
+      min-height: 540px;
+    }
+
+    /* sidebar */
+    .m-sidebar {
+      background: var(--card); border-right: 1px solid var(--border);
+      padding: 20px 12px;
+    }
+    .m-logo {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; margin-bottom: 24px;
+    }
+    .m-logo svg { width: 26px; height: 26px; color: var(--primary); }
+    .m-logo span { font-weight: 700; font-size: 1rem; }
+    .m-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; margin-bottom: 4px;
+      font-size: .82rem; color: var(--muted); cursor: default;
+    }
+    .m-nav-item.active {
+      background: rgba(59,130,246,.12); color: var(--primary);
+    }
+    .m-nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .m-status {
+      margin-top: auto; padding: 10px 12px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: .75rem; color: var(--muted);
+    }
+
+    /* main content */
+    .m-main { padding: 24px; display: flex; flex-direction: column; gap: 18px; overflow: hidden; }
+
+    /* stats row */
+    .m-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .m-stat {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .m-stat-label { font-size: .7rem; color: var(--muted); margin-bottom: 4px; }
+    .m-stat-val { font-size: 1.4rem; font-weight: 700; }
+    .m-stat-sub { font-size: .65rem; color: var(--muted); }
+    .m-stat-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .m-stat-icon svg { width: 18px; height: 18px; }
+    .icon-blue  { background: rgba(59,130,246,.15); color: var(--primary); }
+    .icon-red   { background: rgba(239,68,68,.15);  color: var(--red); }
+    .icon-purple{ background: rgba(139,92,246,.15); color: var(--purple); }
+    .icon-cyan  { background: rgba(6,182,212,.15);  color: var(--cyan); }
+
+    /* charts row */
+    .m-charts { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
+    .m-chart-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .m-chart-title { font-size: .75rem; font-weight: 600; margin-bottom: 12px; }
+
+    /* traffic sparkline */
+    .sparkline { width: 100%; height: 80px; }
+
+    /* alerts list */
+    .m-alert {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px; border-radius: 6px; border: 1px solid;
+      margin-bottom: 6px; font-size: .72rem;
+    }
+    .m-alert.crit  { border-color: rgba(239,68,68,.25);  background: rgba(239,68,68,.07);  }
+    .m-alert.high  { border-color: rgba(249,115,22,.25); background: rgba(249,115,22,.07); }
+    .m-alert.med   { border-color: rgba(234,179,8,.25);  background: rgba(234,179,8,.07);  }
+    .a-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .a-dot.c { background: var(--red); }
+    .a-dot.h { background: var(--orange); }
+    .a-dot.m { background: var(--yellow); }
+    .a-title { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .a-time  { color: var(--muted); }
+
+    /* ── SECTION WRAPPER ── */
+    section { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block; color: var(--primary); font-size: .8rem;
+      font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px;
+    }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 16px; }
+    .section-sub { color: var(--muted); max-width: 560px; margin-bottom: 52px; }
+
+    /* ── FEATURES ── */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px;
+      transition: border-color .25s, transform .25s;
+    }
+    .feat-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+    .feat-icon {
+      width: 46px; height: 46px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .feat-icon svg { width: 22px; height: 22px; }
+    .feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feat-card p  { font-size: .875rem; color: var(--muted); line-height: 1.7; }
+
+    /* ── SCREENS ── */
+    .screens { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .screen-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .screen-header {
+      background: rgba(255,255,255,.04); padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: .75rem; font-weight: 600; display: flex; align-items: center; gap: 8px;
+    }
+    .screen-header svg { width: 14px; height: 14px; color: var(--primary); }
+    .screen-body { padding: 16px; }
+
+    /* devices table mockup */
+    .m-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+    .m-table th { color: var(--muted); text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); font-weight: 500; }
+    .m-table td { padding: 8px; border-bottom: 1px solid rgba(26,58,92,.5); }
+    .m-online { display: inline-flex; align-items: center; gap: 5px; }
+    .m-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .m-dot.on { background: var(--green); }
+    .m-dot.off { background: var(--muted); }
+    .m-tag {
+      background: rgba(59,130,246,.12); color: var(--primary2);
+      padding: 2px 7px; border-radius: 4px; font-size: .65rem; font-weight: 600;
+    }
+
+    /* alerts page mockup */
+    .m-alert-full {
+      border-radius: 8px; border: 1px solid; padding: 10px 12px; margin-bottom: 8px;
+    }
+    .m-alert-full.crit { border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.08); }
+    .m-alert-full.high { border-color: rgba(249,115,22,.3); background: rgba(249,115,22,.08); }
+    .m-alert-full.med  { border-color: rgba(234,179,8,.3);  background: rgba(234,179,8,.08);  }
+    .m-alert-row { display: flex; align-items: center; justify-content: space-between; }
+    .m-sev-badge {
+      font-size: .6rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .sev-crit { background: rgba(239,68,68,.2); color: var(--red); }
+    .sev-high { background: rgba(249,115,22,.2); color: var(--orange); }
+    .sev-med  { background: rgba(234,179,8,.2);  color: var(--yellow); }
+    .m-alert-title { font-size: .75rem; font-weight: 600; margin-bottom: 3px; }
+    .m-alert-desc  { font-size: .68rem; color: var(--muted); }
+
+    /* ── STACK ── */
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .stack-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .stack-card h4 { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+    .stack-items { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stack-pill {
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 6px; font-size: .78rem;
+      font-family: var(--mono); transition: border-color .2s;
+    }
+    .stack-pill:hover { border-color: var(--primary); }
+
+    /* ── QUICK START ── */
+    .qs-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px 40px; }
+    .qs-step { display: flex; gap: 20px; margin-bottom: 28px; }
+    .qs-num {
+      width: 32px; height: 32px; border-radius: 50%; background: rgba(59,130,246,.15);
+      color: var(--primary); font-weight: 700; font-size: .85rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .qs-step h4 { font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
+    .qs-step p  { font-size: .82rem; color: var(--muted); }
+    .code-block {
+      background: #020c18; border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 18px; margin-top: 10px;
+      font-family: var(--mono); font-size: .78rem; color: #7dd3fc;
+      white-space: pre; overflow-x: auto;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 40px 24px;
+      color: var(--muted); font-size: .85rem;
+    }
+    footer a { color: var(--primary2); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .mockup-body { grid-template-columns: 1fr; }
+      .m-sidebar { display: none; }
+      .m-stats { grid-template-columns: 1fr 1fr; }
+      .m-charts { grid-template-columns: 1fr; }
+      .screens { grid-template-columns: 1fr; }
+      .qs-wrap { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>NetSentinel</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#screens">Screenshots</a></li>
+    <li><a href="#stack">Tech Stack</a></li>
+    <li><a href="#quickstart">Quick Start</a></li>
+  </ul>
+  <a href="https://github.com/SaharHalili95/netsentinel" class="nav-btn" target="_blank">View on GitHub</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge"><span class="pulse"></span>Network Security · Real-Time Monitoring</div>
+  <h1>NetSentinel</h1>
+  <p class="hero-sub">
+    Self-hosted network monitoring & intrusion detection platform.
+    Discover devices, scan ports, analyze traffic, detect anomalies — all in real time.
+  </p>
+  <div class="hero-cta">
+    <a href="https://github.com/SaharHalili95/netsentinel" class="btn-primary" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      View on GitHub
+    </a>
+    <a href="#quickstart" class="btn-ghost">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Quick Start
+    </a>
+  </div>
+
+  <!-- DASHBOARD MOCKUP -->
+  <div class="mockup-wrap">
+    <div class="mockup-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <div class="mockup-url">localhost:3000 — NetSentinel Dashboard</div>
+    </div>
+    <div class="mockup-body">
+      <!-- sidebar -->
+      <div class="m-sidebar">
+        <div class="m-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>NetSentinel</span>
+        </div>
+        <div class="m-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="m-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Devices
+        </div>
+        <div class="m-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+          Scans
+        </div>
+        <div class="m-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Alerts
+        </div>
+        <div class="m-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Traffic
+        </div>
+        <div class="m-status"><span class="pulse"></span> System Active</div>
+      </div>
+      <!-- main -->
+      <div class="m-main">
+        <!-- stat cards -->
+        <div class="m-stats">
+          <div class="m-stat">
+            <div>
+              <div class="m-stat-label">Total Devices</div>
+              <div class="m-stat-val">5</div>
+              <div class="m-stat-sub">4 online</div>
+            </div>
+            <div class="m-stat-icon icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+          </div>
+          <div class="m-stat">
+            <div>
+              <div class="m-stat-label">Active Alerts</div>
+              <div class="m-stat-val" style="color:var(--red)">7</div>
+              <div class="m-stat-sub">1 critical</div>
+            </div>
+            <div class="m-stat-icon icon-red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+          </div>
+          <div class="m-stat">
+            <div>
+              <div class="m-stat-label">Network Traffic</div>
+              <div class="m-stat-val">1.2 GB</div>
+              <div class="m-stat-sub">2 suspicious</div>
+            </div>
+            <div class="m-stat-icon icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+          </div>
+          <div class="m-stat">
+            <div>
+              <div class="m-stat-label">Last Scan</div>
+              <div class="m-stat-val">5</div>
+              <div class="m-stat-sub">completed</div>
+            </div>
+            <div class="m-stat-icon icon-cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+            </div>
+          </div>
+        </div>
+        <!-- charts row -->
+        <div class="m-charts">
+          <div class="m-chart-card">
+            <div class="m-chart-title">Network Traffic (24h)</div>
+            <svg class="sparkline" viewBox="0 0 400 80" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity=".4"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- grid lines -->
+              <line x1="0" y1="20" x2="400" y2="20" stroke="#1a3a5c" stroke-width=".5"/>
+              <line x1="0" y1="40" x2="400" y2="40" stroke="#1a3a5c" stroke-width=".5"/>
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#1a3a5c" stroke-width=".5"/>
+              <!-- inbound area -->
+              <path d="M0,60 C20,55 40,50 60,40 S100,20 130,30 S180,15 210,25 S260,10 300,20 S350,30 400,25 L400,80 L0,80Z" fill="url(#g1)"/>
+              <path d="M0,60 C20,55 40,50 60,40 S100,20 130,30 S180,15 210,25 S260,10 300,20 S350,30 400,25" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <!-- outbound area -->
+              <path d="M0,70 C30,65 60,60 90,55 S140,45 170,50 S220,40 260,45 S320,50 370,42 L400,45 L400,80 L0,80Z" fill="url(#g2)"/>
+              <path d="M0,70 C30,65 60,60 90,55 S140,45 170,50 S220,40 260,45 S320,50 370,42 L400,45" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="m-chart-card">
+            <div class="m-chart-title">Recent Alerts</div>
+            <div class="m-alert crit">
+              <div class="a-dot c"></div>
+              <div><div class="a-title">Suspicious port 4444 detected</div><div class="a-time">2 min ago</div></div>
+            </div>
+            <div class="m-alert high">
+              <div class="a-dot h"></div>
+              <div><div class="a-title">New unknown device: 192.168.1.150</div><div class="a-time">5 min ago</div></div>
+            </div>
+            <div class="m-alert med">
+              <div class="a-dot m"></div>
+              <div><div class="a-title">Connection to Germany (watchlist)</div><div class="a-time">10 min ago</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features" style="max-width:1100px;margin:0 auto;">
+  <div class="section-tag">Core Features</div>
+  <h2>Everything you need to secure your network</h2>
+  <p class="section-sub">A complete security toolkit that runs on your own infrastructure, giving you full visibility and control.</p>
+  <div class="features">
+    <div class="feat-card">
+      <div class="feat-icon icon-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <h3>Device Discovery</h3>
+      <p>ARP-based network scanning with nmap detects every device on your LAN. Identifies hostname, vendor, MAC address, and device type automatically.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon icon-purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+      </div>
+      <h3>Port Scanning</h3>
+      <p>Automated port scanning across all discovered devices. Detects open ports, running services, product versions, and flags suspicious configurations like RDP, Telnet, and SMB.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon icon-cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3>Traffic Analysis</h3>
+      <p>Captures and analyzes network traffic patterns. Shows top destinations, protocol distribution, and GeoIP mapping of all external connections.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(239,68,68,.15);color:var(--red)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h3>Anomaly Detection</h3>
+      <p>Intelligent engine detects suspicious activity: connections to watchlist countries, unusual port usage, traffic spikes, and new unknown devices joining the network.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(34,197,94,.15);color:var(--green)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </div>
+      <h3>Real-Time Alerts</h3>
+      <p>WebSocket-powered live alert feed with severity classification (Critical / High / Medium / Low). Acknowledge, resolve, or bulk-dismiss alerts from the dashboard.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(234,179,8,.15);color:var(--yellow)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <h3>Interactive Dashboard</h3>
+      <p>Dark-themed React dashboard with live charts, network topology map, device inventory table, traffic graphs, and full settings management.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section id="screens" style="max-width:1100px;margin:0 auto;padding-top:60px;">
+  <div class="section-tag">Screenshots</div>
+  <h2>See it in action</h2>
+  <p class="section-sub">Every page built for real-world security monitoring workflows.</p>
+  <div class="screens">
+    <!-- Devices -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Devices Page
+      </div>
+      <div class="screen-body">
+        <table class="m-table">
+          <tr><th></th><th>Device</th><th>IP</th><th>Vendor</th><th>Last Seen</th></tr>
+          <tr>
+            <td><span class="m-online"><span class="m-dot on"></span></span></td>
+            <td>router.local</td><td style="font-family:var(--mono);font-size:.68rem">192.168.1.1</td>
+            <td>TP-Link</td><td style="color:var(--muted)">just now</td>
+          </tr>
+          <tr>
+            <td><span class="m-online"><span class="m-dot on"></span></span></td>
+            <td>desktop-pc</td><td style="font-family:var(--mono);font-size:.68rem">192.168.1.100</td>
+            <td>Dell</td><td style="color:var(--muted)">1m ago</td>
+          </tr>
+          <tr>
+            <td><span class="m-online"><span class="m-dot on"></span></span></td>
+            <td>iphone-sahar</td><td style="font-family:var(--mono);font-size:.68rem">192.168.1.101</td>
+            <td>Apple</td><td style="color:var(--muted)">2m ago</td>
+          </tr>
+          <tr>
+            <td><span class="m-online"><span class="m-dot on"></span></span></td>
+            <td><span style="color:var(--red)">Unknown</span> <span class="m-tag">NEW</span></td>
+            <td style="font-family:var(--mono);font-size:.68rem">192.168.1.150</td>
+            <td>—</td><td style="color:var(--muted)">5m ago</td>
+          </tr>
+          <tr>
+            <td><span class="m-online"><span class="m-dot off"></span></span></td>
+            <td style="opacity:.5">old-laptop</td><td style="font-family:var(--mono);font-size:.68rem;opacity:.5">192.168.1.103</td>
+            <td style="opacity:.5">Lenovo</td><td style="color:var(--muted)">3d ago</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        Alerts Page
+      </div>
+      <div class="screen-body">
+        <div class="m-alert-full crit">
+          <div class="m-alert-row">
+            <div class="m-alert-title">Suspicious port 4444 – 192.168.1.150</div>
+            <span class="m-sev-badge sev-crit">Critical</span>
+          </div>
+          <div class="m-alert-desc">Connection to known C2 port on 185.220.101.1 (DE)</div>
+        </div>
+        <div class="m-alert-full high">
+          <div class="m-alert-row">
+            <div class="m-alert-title">New unknown device on network</div>
+            <span class="m-sev-badge sev-high">High</span>
+          </div>
+          <div class="m-alert-desc">MAC: AA:BB:CC:DD:EE:05 · First seen 5 min ago</div>
+        </div>
+        <div class="m-alert-full med">
+          <div class="m-alert-row">
+            <div class="m-alert-title">Connection to watchlist country: Germany</div>
+            <span class="m-sev-badge sev-med">Medium</span>
+          </div>
+          <div class="m-alert-desc">Source: 192.168.1.150 → Berlin, DE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Traffic -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Traffic Analysis
+      </div>
+      <div class="screen-body">
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:8px;font-weight:600">Top Destinations</div>
+        <div style="space-y:6px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:6px;font-size:.75rem">
+            <div><span style="font-family:var(--mono)">8.8.8.8</span> <span style="color:var(--muted)">· Google DNS · US</span></div>
+            <div style="color:var(--text)">43.1 MB</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:6px;font-size:.75rem">
+            <div><span style="font-family:var(--mono)">140.82.121.4</span> <span style="color:var(--muted)">· GitHub · US</span></div>
+            <div style="color:var(--text)">27.2 MB</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:6px;margin-bottom:6px;font-size:.75rem">
+            <div><span style="font-family:var(--mono)">185.220.101.1</span> <span style="color:var(--red)">⚠ Unknown · DE</span></div>
+            <div style="color:var(--red)">2.3 MB</div>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin:12px 0 8px;font-weight:600">Protocol Split</div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:3;background:rgba(59,130,246,.2);border-radius:4px;height:8px"></div>
+          <div style="flex:1;background:rgba(139,92,246,.2);border-radius:4px;height:8px"></div>
+          <div style="flex:.2;background:rgba(6,182,212,.2);border-radius:4px;height:8px"></div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:6px;font-size:.68rem;color:var(--muted)">
+          <span style="color:#3b82f6">■ TCP 78%</span>
+          <span style="color:#8b5cf6">■ UDP 21%</span>
+          <span style="color:#06b6d4">■ ICMP 1%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scans -->
+    <div class="screen-card">
+      <div class="screen-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+        Scan History
+      </div>
+      <div class="screen-body">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="flex:1;min-width:100px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:10px 12px;text-align:center;cursor:default">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px">DISCOVERY</div>
+            <div style="font-size:.8rem;font-weight:600;color:var(--primary)">▶ Run</div>
+          </div>
+          <div style="flex:1;min-width:100px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:10px 12px;text-align:center;cursor:default">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px">PORT SCAN</div>
+            <div style="font-size:.8rem;font-weight:600;color:var(--purple)">▶ Run</div>
+          </div>
+          <div style="flex:1;min-width:100px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);border-radius:8px;padding:10px 12px;text-align:center;cursor:default">
+            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px">FULL SCAN</div>
+            <div style="font-size:.8rem;font-weight:600;color:var(--cyan)">▶ Run</div>
+          </div>
+        </div>
+        <table class="m-table">
+          <tr><th>Type</th><th>Devices</th><th>Ports</th><th>Status</th><th>Duration</th></tr>
+          <tr><td>discovery</td><td>5</td><td>—</td><td style="color:var(--green)">✓ done</td><td style="color:var(--muted)">12.3s</td></tr>
+          <tr><td>port_scan</td><td>4</td><td>8</td><td style="color:var(--green)">✓ done</td><td style="color:var(--muted)">45.7s</td></tr>
+          <tr><td>discovery</td><td>5</td><td>—</td><td style="color:var(--green)">✓ done</td><td style="color:var(--muted)">11.8s</td></tr>
+          <tr><td>full</td><td>0</td><td>—</td><td style="color:var(--red)">✗ failed</td><td style="color:var(--muted)">5.2s</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack" style="max-width:1100px;margin:0 auto;padding-top:60px;">
+  <div class="section-tag">Tech Stack</div>
+  <h2>Built with production-grade tools</h2>
+  <p class="section-sub">Every layer chosen for performance, reliability, and real-world security use.</p>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <h4>Backend</h4>
+      <div class="stack-items">
+        <span class="stack-pill">FastAPI</span>
+        <span class="stack-pill">Python 3.12</span>
+        <span class="stack-pill">SQLAlchemy</span>
+        <span class="stack-pill">Alembic</span>
+        <span class="stack-pill">APScheduler</span>
+        <span class="stack-pill">WebSocket</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h4>Frontend</h4>
+      <div class="stack-items">
+        <span class="stack-pill">Next.js 14</span>
+        <span class="stack-pill">TypeScript</span>
+        <span class="stack-pill">Tailwind CSS</span>
+        <span class="stack-pill">Recharts</span>
+        <span class="stack-pill">Axios</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h4>Infrastructure</h4>
+      <div class="stack-items">
+        <span class="stack-pill">PostgreSQL 16</span>
+        <span class="stack-pill">Redis 7</span>
+        <span class="stack-pill">Docker</span>
+        <span class="stack-pill">Docker Compose</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h4>Security / Network</h4>
+      <div class="stack-items">
+        <span class="stack-pill">nmap</span>
+        <span class="stack-pill">scapy</span>
+        <span class="stack-pill">geoip2</span>
+        <span class="stack-pill">MaxMind</span>
+        <span class="stack-pill">ARP scanning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK START -->
+<section id="quickstart" style="max-width:1100px;margin:0 auto;padding-top:60px;">
+  <div class="section-tag">Quick Start</div>
+  <h2>Up and running in 2 minutes</h2>
+  <p class="section-sub">One Docker Compose command and your entire stack is live.</p>
+  <div class="qs-wrap">
+    <div class="qs-step">
+      <div class="qs-num">1</div>
+      <div>
+        <h4>Clone the repository</h4>
+        <div class="code-block">git clone https://github.com/SaharHalili95/netsentinel.git
+cd netsentinel</div>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-num">2</div>
+      <div>
+        <h4>Configure environment</h4>
+        <p>Copy the example env file and set your network range.</p>
+        <div class="code-block">cp .env.example .env
+# Edit SCAN_NETWORK=192.168.x.0/24 to match your LAN</div>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-num">3</div>
+      <div>
+        <h4>Launch with Docker Compose</h4>
+        <div class="code-block">docker-compose up</div>
+      </div>
+    </div>
+    <div class="qs-step" style="margin-bottom:0">
+      <div class="qs-num">4</div>
+      <div>
+        <h4>Open the dashboard</h4>
+        <p>Navigate to <strong style="color:var(--primary2)">http://localhost:3000</strong> — NetSentinel will start scanning your network automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    Built by <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Sahar Halili</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/SaharHalili95/netsentinel" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Portfolio</a>
+  </p>
+  <p style="margin-top:8px;font-size:.8rem">NetSentinel · Network Monitoring & Intrusion Detection Platform</p>
+</footer>
+
+</body>
+</html>
