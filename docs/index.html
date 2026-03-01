@@ -70,7 +70,7 @@
     .btn-primary {
       background: var(--primary); color: #fff; padding: 12px 26px;
       border-radius: 10px; text-decoration: none; font-weight: 600;
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 8px; border: none; cursor: pointer;
       box-shadow: 0 0 30px rgba(59,130,246,.3);
       transition: transform .2s, box-shadow .2s;
     }
@@ -85,7 +85,7 @@
 
     /* ── LIVE DASHBOARD ── */
     .dashboard-wrap {
-      width: 100%; max-width: 1080px; margin: 48px auto 0;
+      width: 100%; max-width: 1120px; margin: 48px auto 0;
       border-radius: 14px; overflow: hidden;
       border: 1px solid var(--border);
       box-shadow: 0 30px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
@@ -103,7 +103,7 @@
     }
     .db-body {
       display: grid; grid-template-columns: 200px 1fr;
-      min-height: 520px; background: var(--surface);
+      min-height: 560px; background: var(--surface);
     }
 
     /* sidebar */
@@ -126,47 +126,49 @@
     .db-status { display: flex; align-items: center; gap: 7px; padding: 10px 10px 0; font-size: .72rem; color: var(--muted); margin-top: auto; }
 
     /* main area */
-    .db-main { padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+    .db-main { padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
 
     /* page views */
-    .page { display: none; flex-direction: column; gap: 14px; }
+    .page { display: none; flex-direction: column; gap: 12px; }
     .page.active { display: flex; }
 
     /* stat cards */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
     .stat-card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 9px; padding: 12px 14px;
+      border-radius: 9px; padding: 11px 13px;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .stat-label { font-size: .68rem; color: var(--muted); margin-bottom: 3px; }
-    .stat-val { font-size: 1.35rem; font-weight: 700; }
-    .stat-sub { font-size: .62rem; color: var(--muted); margin-top: 2px; }
-    .stat-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .stat-icon svg { width: 16px; height: 16px; }
+    .stat-label { font-size: .65rem; color: var(--muted); margin-bottom: 2px; }
+    .stat-val { font-size: 1.25rem; font-weight: 700; }
+    .stat-sub { font-size: .6rem; color: var(--muted); margin-top: 2px; }
+    .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-icon svg { width: 15px; height: 15px; }
     .i-blue{background:rgba(59,130,246,.15);color:var(--primary);}
     .i-red{background:rgba(239,68,68,.15);color:var(--red);}
     .i-purple{background:rgba(139,92,246,.15);color:var(--purple);}
     .i-cyan{background:rgba(6,182,212,.15);color:var(--cyan);}
     .i-green{background:rgba(34,197,94,.15);color:var(--green);}
+    .i-orange{background:rgba(249,115,22,.15);color:var(--orange);}
+    .i-yellow{background:rgba(234,179,8,.15);color:var(--yellow);}
 
     /* chart card */
-    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 14px; }
-    .chart-title { font-size: .75rem; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-    .chart-title span { font-size: .65rem; color: var(--muted); font-weight: 400; }
-    .charts-row { display: grid; grid-template-columns: 1.7fr 1fr; gap: 10px; }
+    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 13px; }
+    .chart-title { font-size: .74rem; font-weight: 600; margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .chart-title span { font-size: .63rem; color: var(--muted); font-weight: 400; }
+    .charts-row { display: grid; grid-template-columns: 1.8fr 1fr; gap: 10px; }
 
     /* SVG traffic chart */
-    #traffic-canvas { width: 100%; height: 90px; display: block; }
+    #traffic-canvas { width: 100%; height: 85px; display: block; }
 
     /* alert feed */
-    #alert-feed { display: flex; flex-direction: column; gap: 6px; max-height: 230px; overflow-y: auto; }
+    #alert-feed { display: flex; flex-direction: column; gap: 5px; max-height: 210px; overflow-y: auto; }
     #alert-feed::-webkit-scrollbar { width: 3px; }
     #alert-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .alert-item {
       display: flex; align-items: flex-start; gap: 8px;
-      padding: 8px 10px; border-radius: 7px; border: 1px solid;
-      font-size: .72rem; animation: slideIn .35s ease;
+      padding: 7px 9px; border-radius: 7px; border: 1px solid;
+      font-size: .7rem; animation: slideIn .35s ease;
     }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     .alert-item.crit { border-color:rgba(239,68,68,.3); background:rgba(239,68,68,.08); }
@@ -176,11 +178,11 @@
     .al-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
     .al-dot.crit{background:var(--red);} .al-dot.high{background:var(--orange);}
     .al-dot.med{background:var(--yellow);} .al-dot.low{background:var(--primary);}
-    .al-title { font-weight: 600; color: var(--text); }
-    .al-meta  { color: var(--muted); font-size: .65rem; margin-top: 1px; }
+    .al-title { font-weight: 600; color: var(--text); line-height: 1.3; }
+    .al-meta  { color: var(--muted); font-size: .63rem; margin-top: 2px; }
     .al-badge {
       margin-left: auto; flex-shrink: 0;
-      font-size: .58rem; font-weight: 700; padding: 2px 6px;
+      font-size: .57rem; font-weight: 700; padding: 2px 6px;
       border-radius: 4px; text-transform: uppercase;
     }
     .al-badge.crit{background:rgba(239,68,68,.2);color:var(--red);}
@@ -189,12 +191,12 @@
     .al-badge.low{background:rgba(59,130,246,.2);color:var(--primary2);}
 
     /* scan progress */
-    .scan-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 7px; background: var(--card); border: 1px solid var(--border); font-size: .78rem; }
+    .scan-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 7px; background: var(--card); border: 1px solid var(--border); font-size: .75rem; }
     .scan-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .scan-icon svg { width: 14px; height: 14px; }
     .scan-name { font-weight: 600; }
-    .scan-sub  { font-size: .65rem; color: var(--muted); }
-    .scan-status { margin-left: auto; font-size: .68rem; font-weight: 600; }
+    .scan-sub  { font-size: .63rem; color: var(--muted); }
+    .scan-status { margin-left: auto; font-size: .67rem; font-weight: 600; }
     .scan-status.done { color: var(--green); }
     .scan-status.run  { color: var(--primary); }
     .scan-status.fail { color: var(--red); }
@@ -202,27 +204,55 @@
     .progress-bar { height: 100%; background: var(--primary); border-radius: 3px; transition: width 1s linear; }
 
     /* devices table */
-    .dev-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
-    .dev-table th { color: var(--muted); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-weight: 500; font-size: .65rem; text-transform: uppercase; letter-spacing: .04em; }
-    .dev-table td { padding: 8px; border-bottom: 1px solid rgba(26,58,92,.4); }
+    .dev-table { width: 100%; border-collapse: collapse; font-size: .69rem; }
+    .dev-table th { color: var(--muted); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-weight: 500; font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; }
+    .dev-table td { padding: 7px 8px; border-bottom: 1px solid rgba(26,58,92,.4); vertical-align: top; }
     .dev-table tr:last-child td { border-bottom: none; }
     .dev-table tr { transition: background .15s; }
-    .dev-table tr:hover td { background: rgba(255,255,255,.03); }
+    .dev-table tr:hover td { background: rgba(255,255,255,.025); }
     .online-dot { display: inline-flex; align-items: center; gap: 5px; }
-    .d-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .d-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .d-dot.on{background:var(--green);box-shadow:0 0 4px var(--green);}
     .d-dot.off{background:var(--muted);}
-    .new-badge { background:rgba(239,68,68,.15); color:var(--red); border:1px solid rgba(239,68,68,.3); padding:1px 6px; border-radius:4px; font-size:.6rem; font-weight:700; margin-left:4px; }
-    .trusted-badge { background:rgba(34,197,94,.1); color:var(--green); border:1px solid rgba(34,197,94,.3); padding:1px 6px; border-radius:4px; font-size:.6rem; font-weight:700; margin-left:4px; }
+    .tag { padding: 1px 6px; border-radius: 4px; font-size: .58rem; font-weight: 700; display: inline-block; margin-left: 3px; }
+    .tag-new   { background:rgba(239,68,68,.15); color:var(--red); border:1px solid rgba(239,68,68,.3); }
+    .tag-trust { background:rgba(34,197,94,.1); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .tag-warn  { background:rgba(249,115,22,.12); color:var(--orange); border:1px solid rgba(249,115,22,.3); }
+    .tag-crit  { background:rgba(239,68,68,.12); color:var(--red); border:1px solid rgba(239,68,68,.3); }
+    .tag-cve   { background:rgba(139,92,246,.12); color:var(--purple); border:1px solid rgba(139,92,246,.3); }
+    .tag-wifi  { background:rgba(6,182,212,.1); color:var(--cyan); border:1px solid rgba(6,182,212,.25); }
+    .port-pill { background:rgba(255,255,255,.06); border:1px solid var(--border); padding:1px 5px; border-radius:3px; font-family:var(--mono); font-size:.6rem; margin-right:2px; margin-bottom:2px; display:inline-block; }
+    .port-pill.sus { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.35); color:var(--red); }
+    .risk-bar { width: 50px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.07); overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 4px; }
+    .risk-fill { height: 100%; border-radius: 2px; }
 
     /* traffic geo table */
-    .geo-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 6px; background: rgba(255,255,255,.04); margin-bottom: 5px; font-size: .72rem; }
-    .geo-row.sus { background:rgba(239,68,68,.07); border:1px solid rgba(239,68,68,.2); }
-    .geo-flag { font-size: .9rem; margin-right: 6px; }
+    .geo-row { display: grid; grid-template-columns: 28px 1fr auto auto auto; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; background: rgba(255,255,255,.035); margin-bottom: 5px; font-size: .7rem; }
+    .geo-row.sus { background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.2); }
+    .geo-flag { font-size: .9rem; text-align: center; }
+    .geo-info { min-width: 0; }
+    .geo-dst { font-family: var(--mono); font-size: .65rem; color: var(--muted); }
+    .geo-asn { font-size: .6rem; color: var(--muted); margin-top: 1px; }
+    .geo-bytes { font-family: var(--mono); font-size: .67rem; color: var(--cyan); white-space: nowrap; }
+    .geo-proto { font-family: var(--mono); font-size: .6rem; padding: 1px 5px; border-radius: 3px; background: rgba(255,255,255,.06); border: 1px solid var(--border); }
+    .geo-sus-badge { font-size: .58rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(239,68,68,.2); color: var(--red); border: 1px solid rgba(239,68,68,.3); white-space: nowrap; }
 
     /* scanning animation */
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
+
+    /* scan progress overlay */
+    #scan-overlay {
+      position: absolute; inset: 0; background: rgba(6,13,26,.92); z-index: 50;
+      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+      border-radius: 0 0 14px 14px;
+    }
+    #scan-overlay.active { display: flex; }
+    .scan-phase { font-size: .75rem; color: var(--muted); font-family: var(--mono); }
+    .scan-msg   { font-size: .85rem; font-weight: 600; color: var(--text); max-width: 340px; text-align: center; }
+    .scan-pct   { font-size: 2rem; font-weight: 800; color: var(--primary); font-family: var(--mono); }
+    .scan-pb-wrap { width: 320px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .scan-pb-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--cyan)); border-radius: 3px; transition: width .6s ease; }
 
     /* toast notification */
     #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
@@ -242,8 +272,30 @@
     .toast-title { font-size: .82rem; font-weight: 600; margin-bottom: 2px; }
     .toast-body  { font-size: .72rem; color: var(--muted); }
 
+    /* vuln row */
+    .vuln-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(26,58,92,.4); font-size: .69rem; }
+    .vuln-row:last-child { border-bottom: none; }
+
+    /* scan btn */
+    .scan-trigger-btn {
+      background: linear-gradient(135deg, #1d4ed8, var(--primary));
+      color: #fff; border: none; border-radius: 8px; padding: 7px 16px;
+      font-size: .75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: opacity .2s, transform .15s;
+    }
+    .scan-trigger-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .scan-trigger-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    /* mini bandwidth bars */
+    .bw-bar { display: flex; align-items: center; gap: 4px; font-size: .62rem; color: var(--muted); }
+    .bw-seg { height: 3px; border-radius: 2px; display: inline-block; }
+    .bw-up { background: var(--cyan); } .bw-dn { background: var(--purple); }
+
+    /* timeline chart */
+    #timeline-canvas { width: 100%; height: 70px; display: block; }
+
     /* ── BELOW DASHBOARD: sections ── */
-    .sections { max-width: 1080px; margin: 0 auto; }
+    .sections { max-width: 1120px; margin: 0 auto; }
     section { padding: 80px 24px; }
     .section-tag { display: inline-block; color: var(--primary); font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
     h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); font-weight: 800; margin-bottom: 12px; }
@@ -272,7 +324,7 @@
     footer a:hover { text-decoration:underline; }
 
     @media(max-width:768px){
-      nav{padding:12px 18px;} .nav-links{display:none;}
+      nav{padding:12px 18px;}
       .db-body{grid-template-columns:1fr;} .db-sidebar{display:none;}
       .stats-row{grid-template-columns:1fr 1fr;} .charts-row{grid-template-columns:1fr;}
       .qs-card{padding:20px 18px;}
@@ -302,12 +354,12 @@
     Network Security · Real-Time Monitoring
   </div>
   <h1>NetSentinel</h1>
-  <p class="hero-sub">Self-hosted network monitoring & intrusion detection. Watch a live simulation below — no installation needed.</p>
+  <p class="hero-sub">Self-hosted network monitoring & intrusion detection. Live simulation below — no installation needed.</p>
   <div class="hero-cta">
-    <a href="#demo" class="btn-primary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      View Live Demo
-    </a>
+    <button class="btn-primary" onclick="triggerScan()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+      Run Network Scan
+    </button>
     <a href="https://github.com/SaharHalili95/netsentinel" class="btn-ghost" target="_blank">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
       Source Code
@@ -315,10 +367,19 @@
   </div>
 
   <!-- LIVE DASHBOARD MOCKUP -->
-  <div class="dashboard-wrap" id="demo">
+  <div class="dashboard-wrap" id="demo" style="position:relative;">
+    <!-- SCAN OVERLAY -->
+    <div id="scan-overlay">
+      <div id="scan-phase-label" class="scan-phase">PHASE: DISCOVERY</div>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" class="spinning"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7" stroke-dasharray="22 22" /><circle cx="12" cy="12" r="11" stroke-dasharray="10 60"/></svg>
+      <div id="scan-pct-label" class="scan-pct">0%</div>
+      <div id="scan-msg-label" class="scan-msg">Initializing…</div>
+      <div class="scan-pb-wrap"><div id="scan-pb-fill" class="scan-pb-fill" style="width:0%"></div></div>
+    </div>
+
     <div class="db-bar">
       <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-      <div class="db-url">localhost:3000 — NetSentinel · Live Demo</div>
+      <div class="db-url">192.168.1.0/24 — NetSentinel · Live Demo</div>
     </div>
     <div class="db-body">
       <!-- Sidebar -->
@@ -349,6 +410,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Traffic
           </div>
+          <div class="db-nav-item" onclick="showPage('vulns',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Vulnerabilities
+            <span class="badge" id="vuln-badge" style="background:var(--purple)">5</span>
+          </div>
         </div>
         <div class="db-status"><span class="pulse"></span>System Active</div>
       </div>
@@ -360,34 +426,40 @@
         <div class="page active" id="page-dashboard">
           <div class="stats-row">
             <div class="stat-card">
-              <div><div class="stat-label">Total Devices</div><div class="stat-val" id="s-devices">5</div><div class="stat-sub" id="s-online">4 online</div></div>
+              <div><div class="stat-label">Devices Found</div><div class="stat-val" id="s-devices">8</div><div class="stat-sub" id="s-online">7 online</div></div>
               <div class="stat-icon i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
             </div>
             <div class="stat-card">
-              <div><div class="stat-label">Active Alerts</div><div class="stat-val" id="s-alerts" style="color:var(--red)">3</div><div class="stat-sub" id="s-crit">1 critical</div></div>
+              <div><div class="stat-label">Active Alerts</div><div class="stat-val" id="s-alerts" style="color:var(--red)">5</div><div class="stat-sub" id="s-crit">3 critical</div></div>
               <div class="stat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
             </div>
             <div class="stat-card">
-              <div><div class="stat-label">Traffic</div><div class="stat-val" id="s-traffic">1.2 GB</div><div class="stat-sub" id="s-sus">2 suspicious</div></div>
-              <div class="stat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+              <div><div class="stat-label">Open Ports</div><div class="stat-val" id="s-ports">23</div><div class="stat-sub" id="s-sus-ports">4 suspicious</div></div>
+              <div class="stat-icon i-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg></div>
             </div>
             <div class="stat-card">
-              <div><div class="stat-label">Last Scan</div><div class="stat-val" id="s-scan">5</div><div class="stat-sub" id="s-scan-time">just now</div></div>
-              <div class="stat-icon i-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg></div>
+              <div><div class="stat-label">Vulnerabilities</div><div class="stat-val" id="s-vulns" style="color:var(--purple)">5</div><div class="stat-sub" id="s-vuln-crit">2 critical</div></div>
+              <div class="stat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+            </div>
+            <div class="stat-card">
+              <div><div class="stat-label">Suspicious Conns</div><div class="stat-val" id="s-sus-conn" style="color:var(--orange)">2</div><div class="stat-sub">threat intel hits</div></div>
+              <div class="stat-icon i-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             </div>
           </div>
           <div class="charts-row">
             <div class="chart-card">
-              <div class="chart-title">Network Traffic (24h) <span id="traffic-label">live updating</span></div>
-              <svg id="traffic-canvas" viewBox="0 0 500 90" preserveAspectRatio="none">
+              <div class="chart-title">Network Traffic — 24h
+                <span id="traffic-label">↑ <span id="bw-up">0.0</span> Mbps &nbsp;↓ <span id="bw-dn">0.0</span> Mbps</span>
+              </div>
+              <svg id="traffic-canvas" viewBox="0 0 500 85" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity=".35"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/></linearGradient>
                   <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6" stop-opacity=".25"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/></linearGradient>
                   <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity=".3"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient>
                 </defs>
-                <line x1="0" y1="22" x2="500" y2="22" stroke="#1a3a5c" stroke-width=".5"/>
-                <line x1="0" y1="45" x2="500" y2="45" stroke="#1a3a5c" stroke-width=".5"/>
-                <line x1="0" y1="68" x2="500" y2="68" stroke="#1a3a5c" stroke-width=".5"/>
+                <line x1="0" y1="20" x2="500" y2="20" stroke="#1a3a5c" stroke-width=".5"/>
+                <line x1="0" y1="42" x2="500" y2="42" stroke="#1a3a5c" stroke-width=".5"/>
+                <line x1="0" y1="65" x2="500" y2="65" stroke="#1a3a5c" stroke-width=".5"/>
                 <path id="path-a-fill" fill="url(#ga)"/>
                 <path id="path-a-line" fill="none" stroke="#3b82f6" stroke-width="1.8"/>
                 <path id="path-b-fill" fill="url(#gb)"/>
@@ -395,7 +467,7 @@
                 <path id="path-c-fill" fill="url(#gc)"/>
                 <path id="path-c-line" fill="none" stroke="#ef4444" stroke-width="1.5"/>
               </svg>
-              <div style="display:flex;gap:14px;margin-top:6px;font-size:.65rem;color:var(--muted)">
+              <div style="display:flex;gap:14px;margin-top:5px;font-size:.63rem;color:var(--muted)">
                 <span style="color:#3b82f6">▬ Inbound</span>
                 <span style="color:#8b5cf6">▬ Outbound</span>
                 <span style="color:#ef4444">▬ Suspicious</span>
@@ -411,19 +483,35 @@
         <!-- DEVICES PAGE -->
         <div class="page" id="page-devices">
           <div class="chart-card">
-            <div class="chart-title">Device Inventory <span id="device-scan-status"></span></div>
+            <div class="chart-title">
+              Device Inventory
+              <button class="scan-trigger-btn" id="scan-btn" onclick="triggerScan()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+                Scan Network
+              </button>
+            </div>
+            <div style="overflow-x:auto;">
             <table class="dev-table">
-              <thead><tr><th></th><th>Device</th><th>IP Address</th><th>MAC</th><th>Vendor</th><th>Last Seen</th></tr></thead>
+              <thead><tr>
+                <th></th><th>Hostname / IP</th><th>OS</th><th>Open Ports</th>
+                <th>Bandwidth</th><th>Latency</th><th>Risk</th><th>Last Seen</th>
+              </tr></thead>
               <tbody id="devices-tbody"></tbody>
             </table>
+            </div>
           </div>
         </div>
 
         <!-- SCANS PAGE -->
         <div class="page" id="page-scans">
           <div class="chart-card">
-            <div class="chart-title">Scan History <span id="scan-running-label"></span></div>
-            <div style="display:flex;flex-direction:column;gap:8px;" id="scans-list"></div>
+            <div class="chart-title">Scan History
+              <button class="scan-trigger-btn" id="scan-btn2" onclick="triggerScan()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+                New Scan
+              </button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;" id="scans-list"></div>
           </div>
         </div>
 
@@ -431,20 +519,29 @@
         <div class="page" id="page-alerts">
           <div class="chart-card">
             <div class="chart-title">All Alerts <span id="alerts-open-count"></span></div>
-            <div id="alerts-full-list" style="display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;"></div>
+            <div id="alerts-full-list" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;"></div>
           </div>
         </div>
 
         <!-- TRAFFIC PAGE -->
         <div class="page" id="page-traffic">
-          <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
             <div class="stat-card"><div><div class="stat-label">Total Connections</div><div class="stat-val" id="t-conn">11,234</div></div><div class="stat-icon i-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div>
-            <div class="stat-card"><div><div class="stat-label">Suspicious</div><div class="stat-val" id="t-sus" style="color:var(--red)">2</div></div><div class="stat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div></div>
-            <div class="stat-card"><div><div class="stat-label">Countries</div><div class="stat-val">5</div></div><div class="stat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Suspicious IPs</div><div class="stat-val" id="t-sus" style="color:var(--red)">2</div></div><div class="stat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Total Bandwidth</div><div class="stat-val" id="t-bytes">1.4 GB</div></div><div class="stat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Countries</div><div class="stat-val" id="t-countries">6</div></div><div class="stat-icon i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div></div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Top Destinations</div>
+            <div class="chart-title">External Connections — GeoIP Analysis</div>
             <div id="geo-list"></div>
+          </div>
+        </div>
+
+        <!-- VULNERABILITIES PAGE -->
+        <div class="page" id="page-vulns">
+          <div class="chart-card">
+            <div class="chart-title">CVE / Vulnerability Report <span id="vuln-summary"></span></div>
+            <div id="vuln-list" style="max-height:400px;overflow-y:auto;"></div>
           </div>
         </div>
 
@@ -463,32 +560,32 @@
       <div class="feat-card">
         <div class="feat-icon i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
         <h3>Device Discovery</h3>
-        <p>ARP-based network scanning with nmap detects every device on your LAN — hostname, vendor, MAC address, and device type.</p>
+        <p>ARP-based scanning detects every device on your LAN — hostname, vendor, MAC, OS fingerprint, latency, and bandwidth per device.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg></div>
         <h3>Port Scanning</h3>
-        <p>Automated scanning of all discovered devices. Detects open ports, services, versions, and flags risky configurations like RDP, Telnet, and SMB.</p>
+        <p>Full SYN scan with service + version detection. Flags risky ports (RDP, Telnet, SMB, port 4444) and shows service banners.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon i-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <h3>CVE Scanner</h3>
+        <p>Cross-references discovered services against known CVEs. Shows severity, CVSS score, and remediation hints per device.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon i-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
         <h3>Traffic Analysis</h3>
-        <p>Captures traffic patterns in real time. Shows top destinations, protocol distribution, and GeoIP mapping of all external connections.</p>
+        <p>Captures traffic patterns in real time. Shows top destinations, ASN + org info, byte counts, and GeoIP mapping of all external connections.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+        <div class="feat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <h3>Anomaly Detection</h3>
-        <p>Detects suspicious activity: connections to watchlist countries, unusual ports, traffic spikes, and new unknown devices joining the network.</p>
+        <p>Detects SSH brute-force, ARP spoofing, port scans, DNS tunneling, watchlist country connections, and traffic spikes in real time.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon i-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
         <h3>Real-Time Alerts</h3>
-        <p>WebSocket-powered live alert feed with severity classification. Acknowledge, resolve, or bulk-dismiss alerts directly from the dashboard.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(234,179,8,.15);color:var(--yellow)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-        <h3>Dark Dashboard</h3>
-        <p>React-based dashboard with live charts, network topology, device inventory table, traffic graphs, and comprehensive settings management.</p>
+        <p>WebSocket-powered live alert feed with severity classification (critical/high/medium/low). CVE alerts, threat intel, and brute-force detection.</p>
       </div>
     </div>
   </section>
@@ -524,330 +621,470 @@ cd netsentinel</div></div></div>
   <p>Built by <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Sahar Halili</a> &nbsp;·&nbsp; <a href="https://github.com/SaharHalili95/netsentinel" target="_blank">GitHub</a> &nbsp;·&nbsp; <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Portfolio</a></p>
 </footer>
 
-<!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────────────────
-const DEVICES = [
-  { id:1, name:'router.local',   ip:'192.168.1.1',   mac:'AA:BB:CC:DD:EE:01', vendor:'TP-Link',  type:'Router',  online:true,  trusted:true,  new:false },
-  { id:2, name:'desktop-pc',     ip:'192.168.1.100', mac:'AA:BB:CC:DD:EE:02', vendor:'Dell',     type:'Desktop', online:true,  trusted:true,  new:false },
-  { id:3, name:'iphone-sahar',   ip:'192.168.1.101', mac:'AA:BB:CC:DD:EE:03', vendor:'Apple',    type:'Mobile',  online:true,  trusted:true,  new:false },
-  { id:4, name:'smart-tv',       ip:'192.168.1.102', mac:'AA:BB:CC:DD:EE:04', vendor:'Samsung',  type:'TV',      online:true,  trusted:false, new:false },
-  { id:5, name:'Unknown Device', ip:'192.168.1.150', mac:'AA:BB:CC:DD:EE:05', vendor:'Unknown',  type:'?',       online:true,  trusted:false, new:true  },
-  { id:6, name:'old-laptop',     ip:'192.168.1.103', mac:'AA:BB:CC:DD:EE:06', vendor:'Lenovo',   type:'Desktop', online:false, trusted:true,  new:false },
+// ══════════════════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let state = {
+  devices: [],
+  alerts:  [],
+  traffic: [],
+  timeline: [],
+  summary:  {},
+  scanRunning: false,
+};
+
+// ── Seed initial demo data (shown before first real scan) ──────────────────
+const SEED_DEVICES = [
+  { ip_address:'192.168.1.1',   mac_address:'A0:BB:CC:11:22:01', hostname:'router.local',  vendor:'TP-Link',   device_type:'router',  os:'OpenWrt 22.03',          is_online:true, is_trusted:true,  is_new:false, wireless:false, latency_ms:2,  bandwidth:{upload_mbps:12.4,download_mbps:8.1,total_today_mb:2834}, open_ports:{80:{service:'http',banner:'Apache 2.4'},443:{service:'https',banner:'nginx/1.24'},53:{service:'dns',banner:'dnsmasq 2.89'},22:{service:'ssh',banner:'OpenSSH 8.9'}}, has_suspicious_ports:false, suspicious_ports:[], vulnerabilities:[], risk_score:0 },
+  { ip_address:'192.168.1.100', mac_address:'A0:BB:CC:11:22:02', hostname:'desktop-pc',    vendor:'Dell',      device_type:'desktop', os:'Windows 11 Pro 22H2',    is_online:true, is_trusted:true,  is_new:false, wireless:false, latency_ms:4,  bandwidth:{upload_mbps:3.2,download_mbps:15.7,total_today_mb:9240}, open_ports:{22:{service:'ssh',banner:'OpenSSH 8.9'},3389:{service:'RDP',banner:'MS Terminal Service'},445:{service:'SMB',banner:'Windows 11 SMB'}}, has_suspicious_ports:true, suspicious_ports:['3389','445'], vulnerabilities:[{cve:'CVE-2023-21563',severity:'high',description:'BitLocker bypass in Windows 11'},{cve:'CVE-2023-35311',severity:'high',description:'Outlook security feature bypass'}], risk_score:55 },
+  { ip_address:'192.168.1.105', mac_address:'A0:BB:CC:11:22:03', hostname:'macbook-pro',   vendor:'Apple',     device_type:'laptop',  os:'macOS 14.3 Sonoma',      is_online:true, is_trusted:true,  is_new:false, wireless:true,  latency_ms:6,  bandwidth:{upload_mbps:5.1,download_mbps:22.3,total_today_mb:6120}, open_ports:{22:{service:'ssh',banner:'OpenSSH 8.9'},5900:{service:'VNC',banner:'VNC Protocol 3.8'}}, has_suspicious_ports:false, suspicious_ports:[], vulnerabilities:[], risk_score:0 },
+  { ip_address:'192.168.1.112', mac_address:'A0:BB:CC:11:22:04', hostname:'nas-storage',   vendor:'Synology',  device_type:'nas',     os:'DiskStation Manager 7.2',is_online:true, is_trusted:true,  is_new:false, wireless:false, latency_ms:3,  bandwidth:{upload_mbps:2.8,download_mbps:45.2,total_today_mb:18340}, open_ports:{22:{service:'ssh',banner:'OpenSSH 8.9'},80:{service:'http',banner:'nginx'},443:{service:'https',banner:'nginx'},5000:{service:'DSM',banner:'Synology DSM'}}, has_suspicious_ports:false, suspicious_ports:[], vulnerabilities:[{cve:'CVE-2023-2729',severity:'medium',description:'DSM information disclosure'}], risk_score:10 },
+  { ip_address:'192.168.1.150', mac_address:'A0:BB:CC:11:22:05', hostname:null,            vendor:'Unknown',   device_type:'unknown', os:'Unknown',                 is_online:true, is_trusted:false, is_new:true,  wireless:true,  latency_ms:45, bandwidth:{upload_mbps:2.5,download_mbps:1.8,total_today_mb:340}, open_ports:{4444:{service:'backdoor?',banner:'(no banner)'},445:{service:'SMB',banner:'Windows SMB'},1337:{service:'waste',banner:''}}, has_suspicious_ports:true, suspicious_ports:['4444','445','1337'], vulnerabilities:[{cve:'CVE-2017-0144',severity:'critical',description:'EternalBlue SMB remote code execution (MS17-010)'}], risk_score:100 },
+  { ip_address:'192.168.1.88',  mac_address:'A0:BB:CC:11:22:06', hostname:'hp-printer',    vendor:'HP',        device_type:'printer', os:'HP FutureSmart 5.4',     is_online:true, is_trusted:true,  is_new:false, wireless:true,  latency_ms:18, bandwidth:{upload_mbps:0.05,download_mbps:0.1,total_today_mb:12}, open_ports:{9100:{service:'JetDirect',banner:'HP JetDirect'},631:{service:'ipp',banner:'CUPS 2.4'},80:{service:'http',banner:'HP EWS'}}, has_suspicious_ports:false, suspicious_ports:[], vulnerabilities:[{cve:'CVE-2021-39238',severity:'critical',description:'HP printer RCE via font parser'}], risk_score:30 },
 ];
 
-const ALERT_TEMPLATES = [
-  { sev:'crit', type:'Suspicious Port', msg: ip => `Port 4444 connection from ${ip} → 185.220.101.1 (DE)` },
-  { sev:'high', type:'New Device',      msg: ip => `Unknown device joined network: ${ip}` },
-  { sev:'high', type:'Open Port',       msg: ip => `RDP (3389) open on ${ip}` },
-  { sev:'med',  type:'Watchlist',       msg: ip => `Connection to watchlist country from ${ip}` },
-  { sev:'med',  type:'Traffic Spike',   msg: ip => `High traffic volume from ${ip} (>1000 conn/hr)` },
-  { sev:'low',  type:'New Device',      msg: ip => `New trusted device seen: ${ip}` },
-  { sev:'low',  type:'Port Closed',     msg: ip => `Port 22 no longer reachable on ${ip}` },
+const SEED_TRAFFIC = [
+  { dst:'8.8.8.8',       service:'Google DNS',    country:'United States', city:'Mountain View', sus:false, port:53,   proto:'UDP', bytes_sent:14200,  bytes_recv:18900,  asn:'AS15169',  org:'Google LLC' },
+  { dst:'140.82.121.4',  service:'GitHub',        country:'United States', city:'San Francisco', sus:false, port:443,  proto:'TCP', bytes_sent:458000, bytes_recv:2310000,asn:'AS36459',  org:'GitHub, Inc.' },
+  { dst:'17.253.144.10', service:'Apple',         country:'United States', city:'Cupertino',     sus:false, port:443,  proto:'TCP', bytes_sent:214000, bytes_recv:1820000,asn:'AS714',    org:'Apple Inc.' },
+  { dst:'185.220.101.1', service:'Tor Exit Node', country:'Germany',       city:'Berlin',        sus:true,  port:4444, proto:'TCP', bytes_sent:128000, bytes_recv:54000,  asn:'AS60729',  org:'Zwiebeltoralf (Tor)', threat:'Known Tor exit relay — C2 communication suspected' },
+  { dst:'45.142.212.100',service:'Unknown',       country:'Russia',        city:'Moscow',        sus:true,  port:8080, proto:'TCP', bytes_sent:340000, bytes_recv:87000,  asn:'AS208091', org:'Packet Exchange Ltd', threat:'IP flagged in 3 threat intel feeds (AbuseIPDB score: 97)' },
 ];
 
-const GEO_DATA = [
-  { flag:'🇺🇸', country:'United States', bytes:'146.2 MB', conn:'3,460', sus:false, dst:'8.8.8.8 / GitHub / AWS' },
-  { flag:'🇦🇺', country:'Australia',      bytes:'8.9 MB',  conn:'89',    sus:false, dst:'1.1.1.1 (Cloudflare)' },
-  { flag:'🇬🇧', country:'United Kingdom', bytes:'7.8 MB',  conn:'67',    sus:false, dst:'151.101.x.x (Fastly)' },
-  { flag:'🇯🇵', country:'Japan',          bytes:'5.6 MB',  conn:'45',    sus:false, dst:'17.x.x.x (Apple CDN)' },
-  { flag:'🇩🇪', country:'Germany',        bytes:'2.3 MB',  conn:'12',    sus:true,  dst:'185.220.101.1 (unknown)' },
+const SEED_ALERTS = [
+  { severity:'critical', type:'suspicious_traffic', title:'Suspicious outbound: 185.220.101.1 (Germany)', description:'Known Tor exit relay — C2 communication suspected. Port 4444 TCP.', source_ip:'192.168.1.150', timestamp: ts(-2) },
+  { severity:'critical', type:'open_port',         title:'Risky port(s) open on 192.168.1.150',          description:'Port 4444 is commonly used by Metasploit/C2 frameworks. Active connection detected.', source_ip:'192.168.1.150', timestamp: ts(-5) },
+  { severity:'critical', type:'vulnerability',     title:'CVE-2017-0144 on 192.168.1.150 (Unknown)',     description:'EternalBlue SMB remote code execution (MS17-010). Port 445 open and reachable.', source_ip:'192.168.1.150', cve:'CVE-2017-0144', timestamp: ts(-7) },
+  { severity:'high',     type:'new_device',        title:'Unknown device joined network: 192.168.1.150',  description:'Unrecognized device connected. MAC: A0:BB:CC:11:22:05, Vendor lookup: Unknown. Not on trusted list.', source_ip:'192.168.1.150', timestamp: ts(-8) },
+  { severity:'high',     type:'vulnerability',     title:'CVE-2021-39238 on 192.168.1.88 (HP Printer)',  description:'HP printer remote code execution via font parser. Critical severity. Patch firmware immediately.', source_ip:'192.168.1.88', cve:'CVE-2021-39238', timestamp: ts(-14) },
+  { severity:'high',     type:'open_port',         title:'Risky port(s) open on 192.168.1.100',          description:'Port 3389 (RDP) exposed on desktop-pc. Actively targeted by ransomware groups.', source_ip:'192.168.1.100', timestamp: ts(-20) },
+  { severity:'medium',   type:'watchlist_country',  title:'Connection to watchlist country from 192.168.1.150', description:'Outbound TCP to Russia (45.142.212.100:8080). IP in multiple threat intel feeds.', source_ip:'192.168.1.150', timestamp: ts(-25) },
 ];
 
-const SCAN_IPS = ['192.168.1.1','192.168.1.100','192.168.1.101','192.168.1.102','192.168.1.150'];
-
-// ── STATE ─────────────────────────────────────────────────────────────────
-let alertList = [
-  { id:1, sev:'crit', type:'Suspicious Port', msg:'Port 4444 connection from 192.168.1.150 → 185.220.101.1 (DE)', ago:'2m ago' },
-  { id:2, sev:'high', type:'New Device',      msg:'Unknown device joined network: 192.168.1.150',                  ago:'5m ago' },
-  { id:3, sev:'med',  type:'Watchlist',       msg:'Connection to watchlist country from 192.168.1.150',            ago:'10m ago' },
-];
-let alertCount = alertList.length;
-let totalAlertId = alertCount;
-
-let trafficPoints = { a:[], b:[], c:[] };
-const N = 28;
-for (let i = 0; i < N; i++) {
-  trafficPoints.a.push(20 + Math.random() * 50);
-  trafficPoints.b.push(10 + Math.random() * 35);
-  trafficPoints.c.push(Math.random() * 12);
+function ts(minutesAgo) {
+  return new Date(Date.now() + minutesAgo * 60000).toISOString();
 }
-
-let trafficBytes = 1258000000;
-let connections  = 11234;
-let suspiciousConn = 2;
-let scanSeconds  = 0;
-let scanRunning  = false;
-let scanList = [
-  { type:'discovery', status:'done', devices:5, ports:0,  dur:'12.3s', time:'5m ago' },
-  { type:'port_scan', status:'done', devices:4, ports:8,  dur:'45.7s', time:'1h ago' },
-  { type:'discovery', status:'done', devices:5, ports:0,  dur:'11.8s', time:'2h ago' },
-];
-let scanProgress = 0;
-
-// ── UTILS ─────────────────────────────────────────────────────────────────
-function randIp() { return SCAN_IPS[Math.floor(Math.random() * SCAN_IPS.length)]; }
+function agoStr(isoStr) {
+  const diff = Math.round((Date.now() - new Date(isoStr).getTime()) / 60000);
+  if (diff < 1)  return 'just now';
+  if (diff < 60) return diff + 'm ago';
+  return Math.round(diff/60) + 'h ago';
+}
 function fmtBytes(b) {
-  if (b > 1e9) return (b/1e9).toFixed(1)+' GB';
-  if (b > 1e6) return (b/1e6).toFixed(1)+' MB';
-  return (b/1e3).toFixed(0)+' KB';
+  if (b >= 1e9) return (b/1e9).toFixed(1)+' GB';
+  if (b >= 1e6) return (b/1e6).toFixed(2)+' MB';
+  if (b >= 1e3) return (b/1e3).toFixed(1)+' KB';
+  return b+' B';
+}
+function riskColor(r) {
+  if (r >= 80) return 'var(--red)';
+  if (r >= 40) return 'var(--orange)';
+  if (r >= 15) return 'var(--yellow)';
+  return 'var(--green)';
+}
+const countryFlags = { 'United States':'🇺🇸','Australia':'🇦🇺','Germany':'🇩🇪','Russia':'🇷🇺','Netherlands':'🇳🇱','United Kingdom':'🇬🇧','Japan':'🇯🇵','Ireland':'🇮🇪' };
+
+// Init with seed data
+state.devices = SEED_DEVICES;
+state.alerts  = SEED_ALERTS;
+state.traffic = SEED_TRAFFIC;
+state.summary = { devices_found:6, online_devices:6, open_ports:23, new_devices:1, alerts:7, critical_alerts:3, vulnerabilities:5, suspicious_connections:2, total_bandwidth_mb:36886 };
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ══════════════════════════════════════════════════════════════════════════════
+function renderAll() {
+  renderStats();
+  renderDevices();
+  renderAlerts();
+  renderTraffic();
+  renderVulns();
+  renderScans();
+  renderAlertBadge();
 }
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────
+function renderStats() {
+  const s = state.summary;
+  const crits = state.alerts.filter(a => a.severity === 'critical').length;
+  const vuln_crit = state.devices.flatMap(d=>d.vulnerabilities||[]).filter(v=>v.severity==='critical').length;
+  const susPorts = state.devices.flatMap(d=>d.suspicious_ports||[]).length;
+  id('s-devices').textContent = s.devices_found || state.devices.length;
+  id('s-online').textContent  = (s.online_devices || state.devices.filter(d=>d.is_online).length) + ' online';
+  id('s-alerts').textContent  = state.alerts.length;
+  id('s-crit').textContent    = crits + ' critical';
+  id('s-ports').textContent   = s.open_ports || state.devices.reduce((n,d)=>n+Object.keys(d.open_ports||{}).length,0);
+  id('s-sus-ports').textContent = susPorts + ' suspicious';
+  const totalVulns = state.devices.reduce((n,d)=>n+(d.vulnerabilities||[]).length,0);
+  id('s-vulns').textContent   = totalVulns;
+  id('s-vuln-crit').textContent = vuln_crit + ' critical';
+  id('s-sus-conn').textContent = s.suspicious_connections || state.traffic.filter(t=>t.sus).length;
+  id('vuln-badge').textContent = totalVulns;
+}
+
+function renderDevices() {
+  const tbody = id('devices-tbody');
+  tbody.innerHTML = state.devices.map(dev => {
+    const ports = Object.entries(dev.open_ports || {}).map(([p,info]) => {
+      const isSus = (dev.suspicious_ports||[]).includes(p);
+      return `<span class="port-pill${isSus?' sus':''}" title="${info.banner||''}">${p}/${info.service}</span>`;
+    }).join('');
+    const risk = dev.risk_score || 0;
+    const riskBar = `<span style="color:${riskColor(risk)};font-weight:700;">${risk}</span>
+      <span class="risk-bar"><span class="risk-fill" style="width:${risk}%;background:${riskColor(risk)}"></span></span>`;
+    const bwUp = (dev.bandwidth||{}).upload_mbps || 0;
+    const bwDn = (dev.bandwidth||{}).download_mbps || 0;
+    const bwTotal = (dev.bandwidth||{}).total_today_mb || 0;
+    const bwBar = `<div class="bw-bar">
+      <span style="color:var(--cyan)">↑${bwUp}</span>
+      <span style="color:var(--purple)">↓${bwDn}</span>
+    </div><div style="font-size:.59rem;color:var(--muted)">${fmtBytes(bwTotal*1048576)} today</div>`;
+    const wifi = dev.wireless ? '<span class="tag tag-wifi">WiFi</span>' : '';
+    const newTag = dev.is_new ? '<span class="tag tag-new">NEW</span>' : '';
+    const trustTag = dev.is_trusted ? '' : '<span class="tag tag-warn">UNTRUSTED</span>';
+    const ago = dev.last_seen ? agoStr(dev.last_seen) : 'just now';
+    return `<tr>
+      <td><span class="online-dot"><span class="d-dot ${dev.is_online?'on':'off'}"></span></span></td>
+      <td>
+        <div style="font-weight:600;font-family:var(--mono);font-size:.69rem">${dev.hostname||'—'}${newTag}${trustTag}${wifi}</div>
+        <div style="color:var(--muted);font-size:.6rem">${dev.ip_address} · ${dev.mac_address}</div>
+        <div style="color:var(--muted);font-size:.59rem">${dev.vendor}</div>
+      </td>
+      <td style="color:var(--muted);font-size:.65rem;font-family:var(--mono)">${dev.os||'?'}</td>
+      <td>${ports||'<span style="color:var(--muted);font-size:.62rem">none</span>'}</td>
+      <td>${bwBar}</td>
+      <td style="font-family:var(--mono);font-size:.67rem;color:${(dev.latency_ms||0)>30?'var(--orange)':'var(--green)'}">${dev.latency_ms||'?'} ms</td>
+      <td>${riskBar}</td>
+      <td style="color:var(--muted);font-size:.63rem;white-space:nowrap">${ago}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAlerts() {
+  const feed = id('alert-feed');
+  const full = id('alerts-full-list');
+  const sevMap = { critical:'crit', high:'high', medium:'med', low:'low' };
+  const labels = state.alerts.slice(0, 4).map(a => {
+    const s = sevMap[a.severity] || 'low';
+    return `<div class="alert-item ${s}">
+      <div class="al-dot ${s}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="al-title">${a.title}</div>
+        <div class="al-meta">${agoStr(a.timestamp||new Date().toISOString())} · ${a.type?.replace('_',' ')||''}${a.cve?' · '+a.cve:''}</div>
+      </div>
+      <span class="al-badge ${s}">${a.severity === 'critical' ? 'CRIT' : a.severity?.toUpperCase()||''}</span>
+    </div>`;
+  }).join('');
+  feed.innerHTML = labels;
+
+  const fullHtml = state.alerts.map(a => {
+    const s = sevMap[a.severity] || 'low';
+    return `<div class="alert-item ${s}">
+      <div class="al-dot ${s}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="al-title">${a.title}</div>
+        <div style="font-size:.67rem;color:var(--muted);margin-top:2px">${a.description||''}</div>
+        <div class="al-meta" style="margin-top:4px">${agoStr(a.timestamp||new Date().toISOString())} · Source: ${a.source_ip||'?'}${a.cve?' · <span style="color:var(--purple)">'+a.cve+'</span>':''}</div>
+      </div>
+      <span class="al-badge ${s}" style="margin-top:2px">${a.severity === 'critical' ? 'CRIT' : a.severity?.toUpperCase()||''}</span>
+    </div>`;
+  }).join('');
+  full.innerHTML = fullHtml;
+  id('alerts-open-count').textContent = state.alerts.length + ' alerts';
+}
+
+function renderAlertBadge() {
+  const n = state.alerts.filter(a => a.severity === 'critical' || a.severity === 'high').length;
+  id('alert-badge').textContent = n;
+}
+
+function renderTraffic() {
+  const geo = id('geo-list');
+  geo.innerHTML = state.traffic.map(c => {
+    const flag = countryFlags[c.country] || '🌐';
+    const total = (c.bytes_sent||0) + (c.bytes_recv||0);
+    const susHtml = c.sus
+      ? `<span class="geo-sus-badge">⚠ THREAT</span>`
+      : `<span class="geo-proto">${c.proto||'?'}</span>`;
+    const threatHtml = c.threat ? `<div style="font-size:.6rem;color:var(--red);margin-top:1px">⚠ ${c.threat}</div>` : '';
+    return `<div class="geo-row${c.sus?' sus':''}">
+      <div class="geo-flag">${flag}</div>
+      <div class="geo-info">
+        <div style="font-weight:600">${c.country} <span style="color:var(--muted);font-weight:400;font-size:.65rem">· ${c.city||''}</span></div>
+        <div class="geo-dst">${c.dst} :${c.port} → ${c.service||'?'}</div>
+        <div class="geo-asn">${c.asn||''} ${c.org||''}${threatHtml}</div>
+      </div>
+      <div class="geo-bytes">↑${fmtBytes(c.bytes_sent||0)}<br>↓${fmtBytes(c.bytes_recv||0)}</div>
+      <div style="font-size:.62rem;color:var(--muted);text-align:right">${fmtBytes(total)}<br>total</div>
+      ${susHtml}
+    </div>`;
+  }).join('');
+  const countries = new Set(state.traffic.map(c => c.country));
+  id('t-conn').textContent   = (11000 + state.traffic.reduce((n,c)=>n+(c.packets||0),0)).toLocaleString();
+  id('t-sus').textContent    = state.traffic.filter(c=>c.sus).length;
+  id('t-bytes').textContent  = fmtBytes(state.traffic.reduce((n,c)=>n+(c.bytes_sent||0)+(c.bytes_recv||0),0));
+  id('t-countries').textContent = countries.size;
+}
+
+function renderVulns() {
+  const vulns = state.devices.flatMap(dev =>
+    (dev.vulnerabilities||[]).map(v => ({ ...v, ip: dev.ip_address, hostname: dev.hostname||'Unknown' }))
+  );
+  vulns.sort((a,b) => {
+    const o = { critical:0, high:1, medium:2, low:3 };
+    return (o[a.severity]||9) - (o[b.severity]||9);
+  });
+  const sevColors = { critical:'var(--red)', high:'var(--orange)', medium:'var(--yellow)', low:'var(--muted)' };
+  id('vuln-list').innerHTML = vulns.length === 0
+    ? '<div style="color:var(--green);font-size:.8rem;padding:8px">✓ No known vulnerabilities found</div>'
+    : vulns.map(v => `<div class="vuln-row">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span class="tag tag-cve">${v.cve}</span>
+            <span style="font-size:.65rem;font-weight:700;color:${sevColors[v.severity]||'var(--muted)'}">${v.severity?.toUpperCase()}</span>
+            <span style="font-family:var(--mono);font-size:.63rem;color:var(--muted)">${v.ip} (${v.hostname})</span>
+          </div>
+          <div style="font-size:.7rem;color:var(--text)">${v.description}</div>
+        </div>
+      </div>`
+    ).join('');
+  id('vuln-summary').textContent = vulns.length + ' found';
+}
+
+function renderScans() {
+  const list = id('scans-list');
+  const scans = [
+    { type:'Full Scan', status:'done', devices: state.summary.devices_found||6, ports: state.summary.open_ports||23, alerts: state.summary.alerts||7, vulns: state.devices.reduce((n,d)=>n+(d.vulnerabilities||[]).length,0), dur:'14.2s', time:'just now' },
+    { type:'Port Scan', status:'done', devices:6, ports:21, alerts:5, vulns:3, dur:'45.7s', time:'1h ago' },
+    { type:'Discovery', status:'done', devices:6, ports:0,  alerts:4, vulns:0, dur:'11.8s', time:'2h ago' },
+    { type:'Full Scan', status:'done', devices:5, ports:18, alerts:3, vulns:2, dur:'51.2s', time:'5h ago' },
+  ];
+  list.innerHTML = scans.map(sc => `
+    <div class="scan-row">
+      <div class="scan-icon i-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg>
+      </div>
+      <div>
+        <div class="scan-name">${sc.type}</div>
+        <div class="scan-sub">${sc.devices} devices · ${sc.ports} ports · ${sc.alerts} alerts · ${sc.vulns} CVEs · ${sc.dur}</div>
+      </div>
+      <div class="scan-status done">${sc.time}</div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  TRAFFIC CHART
+// ══════════════════════════════════════════════════════════════════════════════
+let trafficPts = { a:[], b:[], c:[] };
+const N = 32;
+for (let i = 0; i < N; i++) {
+  const hr = (new Date().getHours() - N + i + 24) % 24;
+  const base = hr < 7 ? 15 : hr < 9 ? 40 : hr < 18 ? 70 : 45;
+  trafficPts.a.push(base * (0.6 + Math.random() * 0.8));
+  trafficPts.b.push(base * (0.3 + Math.random() * 0.6));
+  trafficPts.c.push(Math.random() * 18);
+}
+
+function drawChart() {
+  const W = 500, H = 85;
+  const toPath = (pts, filled) => {
+    const xs = pts.map((_,i) => i/(pts.length-1)*W);
+    const max = Math.max(...pts, 1);
+    const ys = pts.map(v => H - 6 - (v/max)*(H-14));
+    let d = `M${xs[0]},${ys[0]}`;
+    for (let i=1;i<pts.length;i++) {
+      const mx=(xs[i-1]+xs[i])/2;
+      d+=` C${mx},${ys[i-1]} ${mx},${ys[i]} ${xs[i]},${ys[i]}`;
+    }
+    if (filled) d += ` L${xs[xs.length-1]},${H} L${xs[0]},${H} Z`;
+    return d;
+  };
+  ['a','b','c'].forEach(k => {
+    const line = document.getElementById(`path-${k}-line`);
+    const fill = document.getElementById(`path-${k}-fill`);
+    if (line) line.setAttribute('d', toPath(trafficPts[k], false));
+    if (fill) fill.setAttribute('d', toPath(trafficPts[k], true));
+  });
+  const upMbps  = (trafficPts.b[N-1]/100 * 25).toFixed(1);
+  const dnMbps  = (trafficPts.a[N-1]/100 * 25).toFixed(1);
+  id('bw-up').textContent = upMbps;
+  id('bw-dn').textContent = dnMbps;
+}
+function tickChart() {
+  ['a','b','c'].forEach(k => {
+    trafficPts[k].shift();
+    const last = trafficPts[k][trafficPts[k].length-1];
+    trafficPts[k].push(Math.max(2, last + (Math.random()-0.45)*12));
+  });
+  drawChart();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════════════════════
 function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.db-nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  el.classList.add('active');
-  if (name === 'devices') renderDevices();
-  if (name === 'scans')   renderScans();
-  if (name === 'alerts')  renderAlertsPage();
-  if (name === 'traffic') renderTraffic();
+  if (el) el.classList.add('active');
 }
 
-// ── TRAFFIC CHART ─────────────────────────────────────────────────────────
-function buildPath(points, close) {
-  const w = 500, h = 90, pad = 8;
-  const max = Math.max(...points, 1);
-  const xs = points.map((_, i) => (i / (points.length - 1)) * w);
-  const ys = points.map(v => h - pad - (v / max) * (h - pad * 2));
-  let d = `M${xs[0]},${ys[0]}`;
-  for (let i = 1; i < xs.length; i++) {
-    const cpx = (xs[i-1] + xs[i]) / 2;
-    d += ` C${cpx},${ys[i-1]} ${cpx},${ys[i]} ${xs[i]},${ys[i]}`;
+// ══════════════════════════════════════════════════════════════════════════════
+//  SCAN (calls API if available, else runs local simulation)
+// ══════════════════════════════════════════════════════════════════════════════
+const DEMO_API = null; // Set to Railway URL when deployed e.g. "https://netsentinel.up.railway.app/api/demo"
+
+async function triggerScan() {
+  if (state.scanRunning) return;
+  state.scanRunning = true;
+  ['scan-btn','scan-btn2'].forEach(id2 => { const b=id(id2); if(b){b.disabled=true; b.textContent='Scanning…';} });
+
+  const overlay = id('scan-overlay');
+  overlay.classList.add('active');
+  id('scan-pct-label').textContent = '0%';
+  id('scan-msg-label').textContent = 'Initializing…';
+  id('scan-pb-fill').style.width = '0%';
+
+  if (DEMO_API) {
+    await runApiScan();
+  } else {
+    await runLocalScan();
   }
-  if (close) d += ` L${xs[xs.length-1]},${h} L${xs[0]},${h} Z`;
-  return d;
+
+  overlay.classList.remove('active');
+  state.scanRunning = false;
+  ['scan-btn','scan-btn2'].forEach(i2 => { const b=id(i2); if(b){b.disabled=false; b.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="11"/></svg> Scan Network';} });
+  showToast('critical','Scan Complete', `Found ${state.devices.length} devices · ${state.alerts.filter(a=>a.severity==='critical').length} critical alerts`);
 }
 
-function updateChart() {
-  ['a','b','c'].forEach(k => {
-    const base = k==='a' ? 35 : k==='b' ? 22 : 5;
-    const noise = k==='a' ? 35 : k==='b' ? 25 : 10;
-    trafficPoints[k].push(base + Math.random() * noise);
-    if (trafficPoints[k].length > N) trafficPoints[k].shift();
-    const fill = document.getElementById('path-'+k+'-fill');
-    const line = document.getElementById('path-'+k+'-line');
-    if (fill) fill.setAttribute('d', buildPath(trafficPoints[k], true));
-    if (line) line.setAttribute('d', buildPath(trafficPoints[k], false));
-  });
+async function runApiScan() {
+  try {
+    const resp = await fetch(`${DEMO_API}/scan?count=8`);
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          const data = JSON.parse(line);
+          updateScanOverlay(data);
+          if (data.phase === 'complete' && data.result) {
+            state.devices  = data.result.devices || state.devices;
+            state.alerts   = data.result.alerts  || state.alerts;
+            state.traffic  = data.result.traffic  || state.traffic;
+            state.timeline = data.result.timeline || state.timeline;
+            state.summary  = data.result.summary  || state.summary;
+            renderAll();
+          }
+        } catch(_) {}
+      }
+    }
+  } catch(e) {
+    console.warn('API unreachable, falling back to local sim', e);
+    await runLocalScan();
+  }
 }
 
-// ── ALERT FEED (dashboard mini) ───────────────────────────────────────────
-function renderAlertFeed() {
-  const feed = document.getElementById('alert-feed');
-  if (!feed) return;
-  feed.innerHTML = alertList.slice(0, 5).map(a => `
-    <div class="alert-item ${a.sev}">
-      <div class="al-dot ${a.sev}"></div>
-      <div style="flex:1;min-width:0">
-        <div class="al-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.msg}</div>
-        <div class="al-meta">${a.ago}</div>
-      </div>
-      <span class="al-badge ${a.sev}">${a.type}</span>
-    </div>`).join('');
+async function runLocalScan() {
+  const steps = [
+    [3,  'discovery', 'Initializing network interface eth0…'],
+    [8,  'discovery', 'Starting ARP scan on 192.168.1.0/24…'],
+    [20, 'discovery', 'Broadcasting ARP requests to all 254 hosts…'],
+    [32, 'discovery', `Found ${SEED_DEVICES.length} live hosts`],
+    [40, 'discovery', 'Resolving hostnames via mDNS/NetBIOS…'],
+    [44, 'port_scan', 'Starting SYN port scan…'],
+    [52, 'port_scan', 'Scanning 192.168.1.1 (router.local) — 4 open port(s)'],
+    [58, 'port_scan', 'Scanning 192.168.1.100 (desktop-pc) — 3 open port(s)'],
+    [64, 'port_scan', 'Scanning 192.168.1.150 (unknown) — 3 SUSPICIOUS port(s)'],
+    [70, 'port_scan', 'OS fingerprinting complete'],
+    [75, 'vuln_scan', 'Checking CVE database for known vulnerabilities…'],
+    [82, 'vuln_scan', 'Found 5 potential vulnerabilities — 2 critical'],
+    [86, 'traffic',   'Capturing live traffic (10s sample)…'],
+    [91, 'traffic',   'GeoIP lookup and ASN resolution complete'],
+    [94, 'anomaly',   'Running anomaly detection engine…'],
+    [98, 'anomaly',   'Detected 7 alerts (3 critical)'],
+    [100,'complete',  'Scan complete!'],
+  ];
+  for (const [pct, phase, msg] of steps) {
+    updateScanOverlay({ phase, message: msg, progress: pct });
+    await sleep(350 + Math.random()*400);
+  }
+  // refresh with seed data (already loaded)
+  state.devices = SEED_DEVICES;
+  state.alerts  = SEED_ALERTS;
+  state.traffic = SEED_TRAFFIC;
+  state.summary = { devices_found:6, online_devices:6, open_ports:23, new_devices:1, alerts:7, critical_alerts:3, vulnerabilities:5, suspicious_connections:2, total_bandwidth_mb:36886 };
+  renderAll();
 }
 
-// ── ALERTS PAGE ───────────────────────────────────────────────────────────
-function renderAlertsPage() {
-  const list = document.getElementById('alerts-full-list');
-  const cnt  = document.getElementById('alerts-open-count');
-  if (!list) return;
-  cnt.textContent = `${alertList.length} open`;
-  list.innerHTML = alertList.map(a => `
-    <div class="alert-item ${a.sev}" style="font-size:.75rem">
-      <div class="al-dot ${a.sev}"></div>
-      <div style="flex:1;min-width:0">
-        <div class="al-title">${a.msg}</div>
-        <div class="al-meta">${a.ago} · ${a.type}</div>
-      </div>
-      <span class="al-badge ${a.sev}">${a.sev.toUpperCase()}</span>
-    </div>`).join('');
+function updateScanOverlay(data) {
+  const pct = data.progress || 0;
+  id('scan-pct-label').textContent = pct + '%';
+  id('scan-msg-label').textContent = data.message || '';
+  id('scan-phase-label').textContent = 'PHASE: ' + (data.phase||'').toUpperCase().replace('_',' ');
+  id('scan-pb-fill').style.width = pct + '%';
 }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// ── DEVICES PAGE ──────────────────────────────────────────────────────────
-function renderDevices() {
-  const tbody = document.getElementById('devices-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = DEVICES.map(d => `
-    <tr>
-      <td><span class="online-dot"><span class="d-dot ${d.online?'on':'off'}"></span></span></td>
-      <td style="font-weight:600;color:var(--text)">
-        ${d.name}
-        ${d.new ? '<span class="new-badge">NEW</span>' : ''}
-        ${d.trusted ? '<span class="trusted-badge">✓</span>' : ''}
-      </td>
-      <td style="font-family:var(--mono);font-size:.68rem;color:var(--muted)">${d.ip}</td>
-      <td style="font-family:var(--mono);font-size:.66rem;color:var(--muted)">${d.mac}</td>
-      <td style="color:var(--muted)">${d.vendor}</td>
-      <td style="color:var(--muted)">${d.online ? 'just now' : '3d ago'}</td>
-    </tr>`).join('');
-}
+// ══════════════════════════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════════════════════════
+const TOAST_TEMPLATES = [
+  { sev:'critical', title:'SSH Brute Force',       body: ip => `47 failed logins/60s on ${ip}` },
+  { sev:'critical', title:'Suspicious Outbound',   body: ip => `${ip} → 185.220.101.1:4444 (Tor)` },
+  { sev:'high',     title:'New Unknown Device',    body: ip => `Unrecognized device joined: ${ip}` },
+  { sev:'high',     title:'RDP Port Exposed',      body: ip => `Port 3389 open on ${ip}` },
+  { sev:'medium',   title:'Watchlist Country',     body: ip => `${ip} connecting to Russia:8080` },
+  { sev:'medium',   title:'DNS Anomaly Detected',  body: ip => `Long DNS queries from ${ip} — possible exfiltration` },
+];
+const RAND_IPS = ['192.168.1.1','192.168.1.88','192.168.1.100','192.168.1.112','192.168.1.150'];
 
-// ── SCANS PAGE ────────────────────────────────────────────────────────────
-function renderScans() {
-  const list = document.getElementById('scans-list');
-  const lbl  = document.getElementById('scan-running-label');
-  if (!list) return;
-  lbl.textContent = scanRunning ? '· scanning…' : '';
-  list.innerHTML = scanList.map(s => `
-    <div class="scan-row">
-      <div class="scan-icon ${s.status==='done'?'i-green':s.status==='run'?'i-blue':'i-red'}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          ${s.status==='done'
-            ? '<polyline points="20 6 9 17 4 12"/>'
-            : s.status==='run'
-            ? '<circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="7"/>'
-            : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
-        </svg>
-      </div>
-      <div>
-        <div class="scan-name">${s.type.replace('_',' ')}</div>
-        <div class="scan-sub">${s.devices} devices · ${s.ports} open ports · ${s.time}</div>
-        ${s.status==='run' ? `<div style="margin-top:4px"><div class="progress-bar-wrap"><div class="progress-bar" style="width:${scanProgress}%"></div></div></div>` : ''}
-      </div>
-      <div class="scan-status ${s.status}">${s.status==='done'?'✓ completed':s.status==='run'?'running…':'✗ failed'}</div>
-      <div style="color:var(--muted);font-size:.68rem;margin-left:8px">${s.dur}</div>
-    </div>`).join('');
-}
-
-// ── TRAFFIC PAGE ──────────────────────────────────────────────────────────
-function renderTraffic() {
-  const list = document.getElementById('geo-list');
-  const cs   = document.getElementById('t-conn');
-  const ss   = document.getElementById('t-sus');
-  if (!list) return;
-  if (cs) cs.textContent = connections.toLocaleString();
-  if (ss) ss.textContent = suspiciousConn;
-  list.innerHTML = GEO_DATA.map(g => `
-    <div class="geo-row${g.sus?' sus':''}">
-      <div><span class="geo-flag">${g.flag}</span><strong>${g.country}</strong> <span style="color:var(--muted);font-size:.7rem">· ${g.dst}</span></div>
-      <div style="text-align:right">
-        <div style="font-size:.78rem;font-weight:600;color:${g.sus?'var(--red)':'var(--text)'}">${g.bytes}</div>
-        <div style="font-size:.65rem;color:var(--muted)">${g.conn} conn.</div>
-      </div>
-    </div>`).join('');
-}
-
-// ── STATS UPDATER ─────────────────────────────────────────────────────────
-function updateStats() {
-  trafficBytes += Math.floor(Math.random() * 500000 + 100000);
-  connections  += Math.floor(Math.random() * 8 + 2);
-  const el = document.getElementById('s-traffic');
-  const t2 = document.getElementById('t-conn');
-  if (el) el.textContent = fmtBytes(trafficBytes);
-  if (t2) t2.textContent = connections.toLocaleString();
-  const sa = document.getElementById('s-alerts');
-  const sc = document.getElementById('s-crit');
-  if (sa) sa.textContent = alertList.length;
-  const critCount = alertList.filter(a => a.sev === 'crit').length;
-  if (sc) sc.textContent = critCount + ' critical';
-  document.getElementById('alert-badge').textContent = alertList.length;
-}
-
-// ── TOAST ─────────────────────────────────────────────────────────────────
 function showToast(sev, title, body) {
-  const colors = { crit:'var(--red)', high:'var(--orange)', med:'var(--yellow)', low:'var(--primary)' };
-  const icons  = { crit:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>', high:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>', med:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', low:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' };
-  const c = document.getElementById('toast-container');
-  const div = document.createElement('div');
-  div.className = 'toast';
-  div.innerHTML = `
-    <div class="toast-icon" style="background:${colors[sev]}22;color:${colors[sev]}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons[sev]}</svg>
+  const col = { critical:'var(--red)', high:'var(--orange)', medium:'var(--yellow)', low:'var(--primary)' };
+  const tc = id('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.borderColor = col[sev]||'var(--border)';
+  t.innerHTML = `
+    <div class="toast-icon" style="background:${col[sev]||'var(--primary)'}22;color:${col[sev]||'var(--primary)'}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </div>
     <div><div class="toast-title">${title}</div><div class="toast-body">${body}</div></div>`;
-  c.prepend(div);
-  setTimeout(() => { div.classList.add('out'); setTimeout(() => div.remove(), 300); }, 4500);
+  tc.prepend(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(()=>t.remove(),350); }, 5500);
 }
 
-// ── SIMULATE NEW ALERT ────────────────────────────────────────────────────
-function spawnAlert() {
-  const tpl = ALERT_TEMPLATES[Math.floor(Math.random() * ALERT_TEMPLATES.length)];
-  const ip  = randIp();
-  const msg = tpl.msg(ip);
-  totalAlertId++;
-  const alert = { id: totalAlertId, sev: tpl.sev, type: tpl.type, msg, ago: 'just now' };
-  alertList.unshift(alert);
-  if (alertList.length > 12) alertList.pop();
-  renderAlertFeed();
-  if (document.getElementById('page-alerts').classList.contains('active')) renderAlertsPage();
-  showToast(tpl.sev, `${tpl.sev.toUpperCase()} Alert`, msg);
-  updateStats();
+function spawnToast() {
+  const tpl = TOAST_TEMPLATES[Math.floor(Math.random()*TOAST_TEMPLATES.length)];
+  const ip  = RAND_IPS[Math.floor(Math.random()*RAND_IPS.length)];
+  showToast(tpl.sev, tpl.title, tpl.body(ip));
+  // Add to alert list
+  state.alerts.unshift({ severity: tpl.sev === 'crit' ? 'critical' : tpl.sev, type:'live', title:tpl.title, description:tpl.body(ip), source_ip:ip, timestamp:new Date().toISOString() });
+  renderAlerts(); renderAlertBadge(); renderStats();
 }
 
-// ── SIMULATE SCAN ─────────────────────────────────────────────────────────
-function runScan() {
-  if (scanRunning) return;
-  scanRunning = true;
-  scanProgress = 0;
-  const newScan = { type:'discovery', status:'run', devices:0, ports:0, dur:'…', time:'now' };
-  scanList.unshift(newScan);
-  if (document.getElementById('page-scans').classList.contains('active')) renderScans();
+// ══════════════════════════════════════════════════════════════════════════════
+//  UTIL
+// ══════════════════════════════════════════════════════════════════════════════
+function id(x) { return document.getElementById(x); }
 
-  const iv = setInterval(() => {
-    scanProgress = Math.min(scanProgress + Math.random() * 15 + 5, 95);
-    if (document.getElementById('page-scans').classList.contains('active')) renderScans();
-  }, 400);
-
-  setTimeout(() => {
-    clearInterval(iv);
-    scanProgress = 100;
-    const found = 4 + Math.floor(Math.random() * 3);
-    newScan.status  = 'done';
-    newScan.devices = found;
-    newScan.dur     = (10 + Math.random() * 8).toFixed(1) + 's';
-    newScan.time    = 'just now';
-    scanRunning     = false;
-    document.getElementById('s-scan').textContent      = found;
-    document.getElementById('s-scan-time').textContent = 'just now';
-    if (document.getElementById('page-scans').classList.contains('active')) renderScans();
-    showToast('low', 'Scan Complete', `Discovery scan found ${found} devices on 192.168.1.0/24`);
-  }, 5000);
-}
-
-// ── TICK AGES ─────────────────────────────────────────────────────────────
-function tickAges() {
-  alertList.forEach(a => {
-    if (a.ago === 'just now') a.ago = '1m ago';
-    else {
-      const m = parseInt(a.ago);
-      if (!isNaN(m)) a.ago = (m + 1) + 'm ago';
-    }
-  });
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-updateChart();
-renderAlertFeed();
-renderDevices();
-renderScans();
-renderTraffic();
-updateStats();
-
-// live chart update every 2s
-setInterval(() => { updateChart(); }, 2000);
-
-// stat update every 3s
-setInterval(() => { updateStats(); }, 3000);
-
-// new alert every 12-20s
-function scheduleAlert() {
-  const ms = 12000 + Math.random() * 8000;
-  setTimeout(() => { spawnAlert(); scheduleAlert(); }, ms);
-}
-scheduleAlert();
-
-// scan every 30s
-setTimeout(() => {
-  runScan();
-  setInterval(runScan, 30000);
-}, 8000);
-
-// age alerts every 60s
-setInterval(tickAges, 60000);
+// ══════════════════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════════════════
+renderAll();
+drawChart();
+setInterval(tickChart, 2000);
+setInterval(spawnToast, 18000 + Math.random()*8000);
 </script>
 </body>
 </html>
