@@ -323,6 +323,18 @@
     footer a { color:var(--primary2); text-decoration:none; }
     footer a:hover { text-decoration:underline; }
 
+    /* ── WORLD MAP ── */
+    #world-map-canvas { display: block; width: 100%; cursor: crosshair; border-radius: 0 0 9px 9px; }
+    #map-tooltip {
+      position: fixed; display: none; z-index: 9999;
+      background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 13px; font-size: .7rem; pointer-events: none;
+      min-width: 190px; max-width: 270px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.5);
+      line-height: 1.5;
+    }
+    .map-legend { display: flex; gap: 14px; padding: 7px 13px 10px; font-size: .63rem; color: var(--muted); }
+
     @media(max-width:768px){
       nav{padding:12px 18px;}
       .db-body{grid-template-columns:1fr;} .db-sidebar{display:none;}
@@ -409,6 +421,10 @@
           <div class="db-nav-item" onclick="showPage('traffic',this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Traffic
+          </div>
+          <div class="db-nav-item" onclick="showPage('map',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+            World Map
           </div>
           <div class="db-nav-item" onclick="showPage('vulns',this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -537,6 +553,29 @@
           </div>
         </div>
 
+        <!-- WORLD MAP PAGE -->
+        <div class="page" id="page-map">
+          <div class="chart-card" style="padding:0;overflow:hidden;">
+            <div style="padding:11px 13px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+              <div style="font-size:.74rem;font-weight:600">Connection Map — GeoIP Visualization</div>
+              <div style="font-size:.63rem;color:var(--muted)">Hover dots for details</div>
+            </div>
+            <canvas id="world-map-canvas"></canvas>
+            <div class="map-legend">
+              <span style="color:var(--green)">● Home Network</span>
+              <span style="color:var(--primary2)">● Safe Connection</span>
+              <span style="color:var(--red)">⚠ Threat IP</span>
+              <span style="color:var(--muted)">· Packets in transit</span>
+            </div>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+            <div class="stat-card"><div><div class="stat-label">Connections</div><div class="stat-val" id="m-conn">5</div><div class="stat-sub">tracked</div></div><div class="stat-icon i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Threat IPs</div><div class="stat-val" id="m-threat" style="color:var(--red)">2</div><div class="stat-sub">flagged</div></div><div class="stat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Countries</div><div class="stat-val" id="m-countries">3</div><div class="stat-sub">reached</div></div><div class="stat-icon i-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Bandwidth</div><div class="stat-val" id="m-bytes">4.9 MB</div><div class="stat-sub">total</div></div><div class="stat-icon i-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div>
+          </div>
+        </div>
+
         <!-- VULNERABILITIES PAGE -->
         <div class="page" id="page-vulns">
           <div class="chart-card">
@@ -622,6 +661,7 @@ cd netsentinel</div></div></div>
 </footer>
 
 <div id="toast-container"></div>
+<div id="map-tooltip"></div>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
@@ -647,11 +687,11 @@ const SEED_DEVICES = [
 ];
 
 const SEED_TRAFFIC = [
-  { dst:'8.8.8.8',       service:'Google DNS',    country:'United States', city:'Mountain View', sus:false, port:53,   proto:'UDP', bytes_sent:14200,  bytes_recv:18900,  asn:'AS15169',  org:'Google LLC' },
-  { dst:'140.82.121.4',  service:'GitHub',        country:'United States', city:'San Francisco', sus:false, port:443,  proto:'TCP', bytes_sent:458000, bytes_recv:2310000,asn:'AS36459',  org:'GitHub, Inc.' },
-  { dst:'17.253.144.10', service:'Apple',         country:'United States', city:'Cupertino',     sus:false, port:443,  proto:'TCP', bytes_sent:214000, bytes_recv:1820000,asn:'AS714',    org:'Apple Inc.' },
-  { dst:'185.220.101.1', service:'Tor Exit Node', country:'Germany',       city:'Berlin',        sus:true,  port:4444, proto:'TCP', bytes_sent:128000, bytes_recv:54000,  asn:'AS60729',  org:'Zwiebeltoralf (Tor)', threat:'Known Tor exit relay — C2 communication suspected' },
-  { dst:'45.142.212.100',service:'Unknown',       country:'Russia',        city:'Moscow',        sus:true,  port:8080, proto:'TCP', bytes_sent:340000, bytes_recv:87000,  asn:'AS208091', org:'Packet Exchange Ltd', threat:'IP flagged in 3 threat intel feeds (AbuseIPDB score: 97)' },
+  { dst:'8.8.8.8',       service:'Google DNS',    country:'United States', city:'Mountain View', lat:37.39, lon:-122.08, sus:false, port:53,   proto:'UDP', bytes_sent:14200,  bytes_recv:18900,  asn:'AS15169',  org:'Google LLC' },
+  { dst:'140.82.121.4',  service:'GitHub',        country:'United States', city:'San Francisco', lat:37.77, lon:-122.41, sus:false, port:443,  proto:'TCP', bytes_sent:458000, bytes_recv:2310000,asn:'AS36459',  org:'GitHub, Inc.' },
+  { dst:'17.253.144.10', service:'Apple',         country:'United States', city:'Cupertino',     lat:37.32, lon:-122.03, sus:false, port:443,  proto:'TCP', bytes_sent:214000, bytes_recv:1820000,asn:'AS714',    org:'Apple Inc.' },
+  { dst:'185.220.101.1', service:'Tor Exit Node', country:'Germany',       city:'Berlin',        lat:52.52, lon:13.40,   sus:true,  port:4444, proto:'TCP', bytes_sent:128000, bytes_recv:54000,  asn:'AS60729',  org:'Zwiebeltoralf (Tor)', threat:'Known Tor exit relay — C2 communication suspected' },
+  { dst:'45.142.212.100',service:'Unknown',       country:'Russia',        city:'Moscow',        lat:55.75, lon:37.62,   sus:true,  port:8080, proto:'TCP', bytes_sent:340000, bytes_recv:87000,  asn:'AS208091', org:'Packet Exchange Ltd', threat:'IP flagged in 3 threat intel feeds (AbuseIPDB score: 97)' },
 ];
 
 const SEED_ALERTS = [
@@ -704,6 +744,7 @@ function renderAll() {
   renderVulns();
   renderScans();
   renderAlertBadge();
+  renderMapStats();
 }
 
 function renderStats() {
@@ -931,6 +972,8 @@ function showPage(name, el) {
   document.querySelectorAll('.db-nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if (el) el.classList.add('active');
+  if (name === 'map') { mapActive = true;  initWorldMap(); }
+  else                { mapActive = false; if (mapAF) { cancelAnimationFrame(mapAF); mapAF = null; } }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1071,6 +1114,218 @@ function spawnToast() {
   // Add to alert list
   state.alerts.unshift({ severity: tpl.sev === 'crit' ? 'critical' : tpl.sev, type:'live', title:tpl.title, description:tpl.body(ip), source_ip:ip, timestamp:new Date().toISOString() });
   renderAlerts(); renderAlertBadge(); renderStats();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  WORLD MAP
+// ══════════════════════════════════════════════════════════════════════════════
+// Simplified continent outlines as [lon, lat] arrays (equirectangular projection)
+const CONTINENTS = [
+  // North America
+  [[-168,60],[-141,70],[-100,73],[-60,70],[-55,47],[-65,44],[-80,26],[-87,15],[-77,8],[-90,16],[-105,19],[-118,29],[-117,32],[-124,47],[-148,60]],
+  // South America
+  [[-80,10],[-60,12],[-50,5],[-35,-5],[-35,-25],[-42,-35],[-53,-33],[-65,-55],[-75,-51],[-82,-35],[-82,-10]],
+  // Europe
+  [[-10,36],[0,43],[15,38],[28,42],[36,42],[40,55],[30,60],[25,65],[18,68],[8,72],[-10,72],[-22,65],[-25,63],[-15,56],[-8,44]],
+  // Africa
+  [[-18,16],[-17,12],[-8,5],[8,4],[25,2],[40,11],[52,11],[51,28],[37,22],[38,12],[43,12],[51,25],[45,38],[32,32],[25,38],[13,38],[-2,35],[-10,30],[-18,22]],
+  // Asia (incl. Middle East)
+  [[26,42],[36,42],[40,55],[60,55],[70,65],[90,72],[120,73],[140,68],[145,50],[130,40],[120,30],[105,20],[102,12],[95,10],[80,8],[73,20],[62,22],[56,26],[42,37],[36,37]],
+  // Australia
+  [[114,-22],[122,-18],[132,-12],[142,-10],[154,-18],[154,-32],[148,-40],[140,-38],[132,-34],[118,-34],[114,-26]],
+  // Greenland
+  [[-45,83],[-17,76],[-18,70],[-42,68],[-55,70],[-60,75]],
+  // Japan (simplified)
+  [[130,31],[131,33],[134,34],[138,36],[141,40],[141,42],[137,36],[134,34]],
+  // UK
+  [[-5,50],[0,51],[2,52],[0,58],[-5,58],[-7,55],[-5,50]],
+  // Scandinavia (simplified)
+  [[5,57],[8,58],[10,58],[15,67],[25,70],[30,70],[28,65],[20,60],[14,56],[8,57],[5,57]],
+  // Iceland
+  [[-24,63],[-14,63],[-13,65],[-22,65],[-24,63]],
+];
+const HOME = { lon: 34.8, lat: 32.1 }; // Tel Aviv / Israel
+
+let mapActive = false;
+let mapAF = null;
+
+function lonLatToXY(lon, lat, W, H) {
+  return [((lon + 180) / 360) * W, ((90 - lat) / 180) * H];
+}
+
+function qbezier(x0, y0, cx, cy, x1, y1, t) {
+  const u = 1 - t;
+  return [u*u*x0 + 2*u*t*cx + t*t*x1, u*u*y0 + 2*u*t*cy + t*t*y1];
+}
+
+function initWorldMap() {
+  const canvas = id('world-map-canvas');
+  if (!canvas) return;
+  // Size canvas to fit its container
+  const W = canvas.parentElement.clientWidth || 760;
+  const H = Math.round(W * 0.38);
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  if (mapAF) cancelAnimationFrame(mapAF);
+  function loop(t) {
+    if (!mapActive) return;
+    drawWorldMap(ctx, W, H, t);
+    mapAF = requestAnimationFrame(loop);
+  }
+  mapAF = requestAnimationFrame(loop);
+
+  // Tooltip on hover
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const my = (e.clientY - rect.top)  * (H / rect.height);
+    const tt = id('map-tooltip');
+    const conns = state.traffic.filter(c => c.lat != null);
+    const [hx, hy] = lonLatToXY(HOME.lon, HOME.lat, W, H);
+
+    let hit = null;
+    if (Math.hypot(mx - hx, my - hy) < 12) {
+      hit = '__home__';
+    } else {
+      for (const c of conns) {
+        const [cx, cy] = lonLatToXY(c.lon, c.lat, W, H);
+        if (Math.hypot(mx - cx, my - cy) < 12) { hit = c; break; }
+      }
+    }
+    if (!hit) { tt.style.display = 'none'; return; }
+    if (hit === '__home__') {
+      tt.innerHTML = `<div style="font-weight:600;color:var(--green)">⬡ Home Network</div>
+        <div style="color:var(--muted);font-size:.62rem">192.168.1.0/24 · Israel</div>
+        <div style="color:var(--muted);font-size:.62rem">${state.devices.length} devices · ${state.devices.filter(d=>d.is_online).length} online</div>`;
+    } else {
+      tt.innerHTML = `
+        <div style="font-weight:600;color:${hit.sus?'var(--red)':'var(--text)'}">${hit.sus?'⚠ ':''}${hit.service||hit.dst}</div>
+        <div style="font-family:var(--mono);font-size:.62rem;color:var(--muted)">${hit.dst} :${hit.port} ${hit.proto}</div>
+        <div style="color:var(--muted);font-size:.62rem">${hit.city}, ${hit.country}</div>
+        <div style="color:var(--muted);font-size:.6rem">${hit.asn} · ${hit.org}</div>
+        <div style="color:var(--cyan);font-size:.62rem;margin-top:4px">↑ ${fmtBytes(hit.bytes_sent||0)} &nbsp;↓ ${fmtBytes(hit.bytes_recv||0)}</div>
+        ${hit.threat ? `<div style="color:var(--red);font-size:.6rem;margin-top:3px">⚠ ${hit.threat}</div>` : ''}`;
+    }
+    tt.style.display = 'block';
+    tt.style.left = (e.clientX + 14) + 'px';
+    tt.style.top  = (e.clientY - 24) + 'px';
+  };
+  canvas.onmouseleave = () => { id('map-tooltip').style.display = 'none'; };
+}
+
+function drawWorldMap(ctx, W, H, t) {
+  // Background
+  ctx.fillStyle = '#040e1f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(59,130,246,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let lon = -180; lon <= 180; lon += 30) {
+    const [x] = lonLatToXY(lon, 0, W, H);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let lat = -90; lat <= 90; lat += 30) {
+    const [, y] = lonLatToXY(0, lat, W, H);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Continents
+  ctx.fillStyle   = 'rgba(18,45,75,0.92)';
+  ctx.strokeStyle = 'rgba(59,130,246,0.28)';
+  ctx.lineWidth   = 0.7;
+  for (const pts of CONTINENTS) {
+    ctx.beginPath();
+    pts.forEach(([lon, lat], i) => {
+      const [x, y] = lonLatToXY(lon, lat, W, H);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+
+  const [hx, hy] = lonLatToXY(HOME.lon, HOME.lat, W, H);
+  const conns = state.traffic.filter(c => c.lat != null);
+
+  // Draw arc connections
+  conns.forEach((conn, idx) => {
+    const [cx, cy] = lonLatToXY(conn.lon, conn.lat, W, H);
+    const isSus = conn.sus;
+    // Bezier control point arcs upward
+    const mx = (hx + cx) / 2;
+    const my = Math.min(hy, cy) - Math.abs(cx - hx) * 0.28 - 18;
+
+    // Full faded path
+    ctx.beginPath();
+    ctx.moveTo(hx, hy);
+    ctx.quadraticCurveTo(mx, my, cx, cy);
+    ctx.strokeStyle = isSus ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.14)';
+    ctx.lineWidth   = isSus ? 1.2 : 0.8;
+    ctx.stroke();
+
+    // Animated packet — travels home→dst, loops
+    const period = isSus ? 1600 : 2600;
+    const phase  = ((t + idx * 750) % period) / period;
+    const [px, py] = qbezier(hx, hy, mx, my, cx, cy, phase);
+
+    // Glow
+    ctx.beginPath();
+    ctx.arc(px, py, 7, 0, Math.PI * 2);
+    ctx.fillStyle = isSus ? 'rgba(239,68,68,0.12)' : 'rgba(59,130,246,0.1)';
+    ctx.fill();
+    // Dot
+    ctx.beginPath();
+    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = isSus ? '#f87171' : '#60a5fa';
+    ctx.fill();
+
+    // Destination dot
+    const pulse = (Math.sin(t / 550 + idx * 2.1) + 1) / 2;
+    if (isSus) {
+      // Expanding red ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5 + pulse * 10, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(239,68,68,${0.5 * (1 - pulse)})`;
+      ctx.lineWidth = 1.2; ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, isSus ? 4.5 : 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = isSus
+      ? `rgba(239,68,68,${0.7 + pulse * 0.3})`
+      : `rgba(59,130,246,${0.6 + pulse * 0.2})`;
+    ctx.fill();
+
+    // City label
+    ctx.font = isSus ? 'bold 8.5px Inter,sans-serif' : '8px Inter,sans-serif';
+    ctx.fillStyle = isSus ? 'rgba(252,165,165,0.95)' : 'rgba(147,197,253,0.8)';
+    const label = isSus ? `⚠ ${conn.city}` : conn.service;
+    const tw = ctx.measureText(label).width;
+    ctx.fillText(label, cx > W * 0.55 ? cx - tw - 7 : cx + 7, cy - 7);
+  });
+
+  // Home dot
+  const hp = (Math.sin(t / 800) + 1) / 2;
+  ctx.beginPath();
+  ctx.arc(hx, hy, 6 + hp * 5, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(34,197,94,${0.35 * (1 - hp)})`;
+  ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(hx, hy, 4.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#22c55e'; ctx.fill();
+  ctx.font = 'bold 8px Inter,sans-serif';
+  ctx.fillStyle = 'rgba(134,239,172,0.9)';
+  ctx.fillText('⬡ Home', hx + 7, hy - 6);
+}
+
+function renderMapStats() {
+  const conns = state.traffic.filter(c => c.lat != null);
+  const countries = new Set(conns.map(c => c.country));
+  const el = (x) => document.getElementById(x);
+  if (el('m-conn'))      el('m-conn').textContent      = conns.length;
+  if (el('m-threat'))    el('m-threat').textContent    = conns.filter(c=>c.sus).length;
+  if (el('m-countries')) el('m-countries').textContent = countries.size;
+  if (el('m-bytes'))     el('m-bytes').textContent     = fmtBytes(conns.reduce((n,c)=>n+(c.bytes_sent||0)+(c.bytes_recv||0),0));
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
