@@ -323,6 +323,65 @@
     footer a { color:var(--primary2); text-decoration:none; }
     footer a:hover { text-decoration:underline; }
 
+    /* ── DEVICE DETAIL PANEL ── */
+    #dev-panel-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(4,8,20,.65); backdrop-filter: blur(3px);
+      display: none;
+    }
+    #dev-panel-overlay.active { display: block; }
+    #dev-panel {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 430px; max-width: 96vw;
+      background: var(--surface); border-left: 1px solid var(--border);
+      z-index: 201; overflow-y: auto; display: flex; flex-direction: column;
+      transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    #dev-panel.open { transform: translateX(0); }
+    .dp-header {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--surface); z-index: 1;
+    }
+    .dp-close {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+    }
+    .dp-close:hover { background: rgba(255,255,255,.06); color: var(--text); }
+    .dp-close svg { width: 16px; height: 16px; }
+    .dp-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .dp-section { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 13px; }
+    .dp-sec-title { font-size: .67rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+    .dp-hostname { font-size: 1.05rem; font-weight: 700; font-family: var(--mono); line-height: 1.3; }
+    .dp-meta { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+    .dp-risk-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .dp-risk-bar-wrap { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.07); overflow: hidden; }
+    .dp-risk-bar-fill { height: 100%; border-radius: 3px; }
+    .dp-mini-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-top: 10px; }
+    .dp-mini-card { text-align: center; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 7px; padding: 7px 4px; }
+    .dp-mini-label { font-size: .58rem; color: var(--muted); }
+    .dp-mini-val { font-size: .9rem; font-weight: 700; margin-top: 1px; }
+    .port-table { width: 100%; border-collapse: collapse; font-size: .68rem; }
+    .port-table th { color: var(--muted); text-align: left; padding: 4px 5px; border-bottom: 1px solid var(--border); font-weight: 500; font-size: .6rem; text-transform: uppercase; }
+    .port-table td { padding: 6px 5px; border-bottom: 1px solid rgba(26,58,92,.35); vertical-align: middle; }
+    .port-table tr:last-child td { border-bottom: none; }
+    .dp-vuln-item { padding: 7px 0; border-bottom: 1px solid rgba(26,58,92,.4); }
+    .dp-vuln-item:last-child { border-bottom: none; }
+    #dp-sparkline { width: 100%; height: 60px; display: block; }
+    .dp-action-row { display: flex; gap: 7px; }
+    .dp-action-btn {
+      flex: 1; padding: 7px 4px; border-radius: 7px;
+      border: 1px solid var(--border); background: rgba(255,255,255,.04);
+      color: var(--text); font-size: .72rem; font-weight: 600; cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .dp-action-btn:hover { background: rgba(255,255,255,.08); border-color: var(--primary); }
+    .dp-action-btn.trust { border-color: rgba(34,197,94,.35); color: var(--green); }
+    .dp-action-btn.trust:hover { background: rgba(34,197,94,.07); }
+    .dp-action-btn.danger { border-color: rgba(239,68,68,.35); color: var(--red); }
+    .dp-action-btn.danger:hover { background: rgba(239,68,68,.07); }
+
     /* ── WORLD MAP ── */
     #world-map-canvas { display: block; width: 100%; cursor: crosshair; border-radius: 0 0 9px 9px; }
     #map-tooltip {
@@ -660,6 +719,18 @@ cd netsentinel</div></div></div>
   <p>Built by <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Sahar Halili</a> &nbsp;·&nbsp; <a href="https://github.com/SaharHalili95/netsentinel" target="_blank">GitHub</a> &nbsp;·&nbsp; <a href="https://saharhalili95.github.io/html-portfolio/" target="_blank">Portfolio</a></p>
 </footer>
 
+<!-- DEVICE DETAIL PANEL -->
+<div id="dev-panel-overlay" onclick="closeDevPanel()"></div>
+<div id="dev-panel">
+  <div class="dp-header">
+    <div style="font-size:.82rem;font-weight:600">Device Detail</div>
+    <button class="dp-close" onclick="closeDevPanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</div>
+
 <div id="toast-container"></div>
 <div id="map-tooltip"></div>
 
@@ -767,7 +838,7 @@ function renderStats() {
 
 function renderDevices() {
   const tbody = id('devices-tbody');
-  tbody.innerHTML = state.devices.map(dev => {
+  tbody.innerHTML = state.devices.map((dev, idx) => {
     const ports = Object.entries(dev.open_ports || {}).map(([p,info]) => {
       const isSus = (dev.suspicious_ports||[]).includes(p);
       return `<span class="port-pill${isSus?' sus':''}" title="${info.banner||''}">${p}/${info.service}</span>`;
@@ -786,7 +857,7 @@ function renderDevices() {
     const newTag = dev.is_new ? '<span class="tag tag-new">NEW</span>' : '';
     const trustTag = dev.is_trusted ? '' : '<span class="tag tag-warn">UNTRUSTED</span>';
     const ago = dev.last_seen ? agoStr(dev.last_seen) : 'just now';
-    return `<tr>
+    return `<tr onclick="openDevPanel(${idx})" style="cursor:pointer" title="Click for details">
       <td><span class="online-dot"><span class="d-dot ${dev.is_online?'on':'off'}"></span></span></td>
       <td>
         <div style="font-weight:600;font-family:var(--mono);font-size:.69rem">${dev.hostname||'—'}${newTag}${trustTag}${wifi}</div>
@@ -1114,6 +1185,209 @@ function spawnToast() {
   // Add to alert list
   state.alerts.unshift({ severity: tpl.sev === 'crit' ? 'critical' : tpl.sev, type:'live', title:tpl.title, description:tpl.body(ip), source_ip:ip, timestamp:new Date().toISOString() });
   renderAlerts(); renderAlertBadge(); renderStats();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  DEVICE DETAIL PANEL
+// ══════════════════════════════════════════════════════════════════════════════
+const DEV_ICONS = { router:'🔀', desktop:'🖥', laptop:'💻', mobile:'📱', nas:'💾', printer:'🖨', iot:'📡', tv:'📺', server:'🖥', unknown:'❓' };
+const SEV_COL   = { critical:'var(--red)', high:'var(--orange)', medium:'var(--yellow)', low:'var(--muted)' };
+
+function openDevPanel(idx) {
+  const dev = state.devices[idx];
+  if (!dev) return;
+  const risk   = dev.risk_score || 0;
+  const rc     = riskColor(risk);
+  const ports  = Object.entries(dev.open_ports || {});
+  const vulns  = dev.vulnerabilities || [];
+  const bwUp   = dev.bandwidth?.upload_mbps   || 0;
+  const bwDn   = dev.bandwidth?.download_mbps || 0;
+  const bwTot  = dev.bandwidth?.total_today_mb || 0;
+  const icon   = DEV_ICONS[dev.device_type] || '🔌';
+  const ago    = dev.last_seen ? agoStr(dev.last_seen) : 'just now';
+
+  // Find related traffic (any suspicious conn involving this device)
+  const relatedTraffic = state.traffic.filter(t => t.sus);
+
+  id('dp-body').innerHTML = `
+    <!-- Actions -->
+    <div class="dp-section">
+      <div class="dp-action-row">
+        <button class="dp-action-btn trust"  onclick="devAction('trust','${dev.ip_address}',${idx})">✓ Trust</button>
+        <button class="dp-action-btn"        onclick="devAction('rescan','${dev.ip_address}',${idx})">⟳ Rescan</button>
+        <button class="dp-action-btn danger" onclick="devAction('block','${dev.ip_address}',${idx})">⊘ Block</button>
+      </div>
+    </div>
+
+    <!-- Identity -->
+    <div class="dp-section">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+        <div style="font-size:1.8rem;line-height:1;flex-shrink:0">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="dp-hostname">${dev.hostname || '—'}
+            ${dev.is_new ? '<span class="tag tag-new">NEW</span>' : ''}
+            ${!dev.is_trusted ? '<span class="tag tag-warn">UNTRUSTED</span>' : '<span class="tag tag-trust">TRUSTED</span>'}
+            ${dev.wireless ? '<span class="tag tag-wifi">WiFi</span>' : ''}
+          </div>
+          <div class="dp-meta">${dev.ip_address} · <span style="font-family:var(--mono)">${dev.mac_address}</span></div>
+          <div class="dp-meta">${dev.vendor}</div>
+          <div class="dp-meta" style="font-family:var(--mono);color:var(--text);margin-top:3px">${dev.os || 'Unknown OS'}</div>
+          <div style="display:flex;align-items:center;gap:5px;margin-top:6px">
+            <span class="d-dot ${dev.is_online?'on':'off'}"></span>
+            <span style="font-size:.7rem;color:${dev.is_online?'var(--green)':'var(--muted)'}">${dev.is_online ? 'Online' : 'Offline'}</span>
+            <span style="font-size:.65rem;color:var(--muted);margin-left:6px">Last seen ${ago}</span>
+          </div>
+        </div>
+      </div>
+      <div class="dp-risk-row">
+        <span style="font-size:.68rem;color:var(--muted);white-space:nowrap">Risk Score</span>
+        <div class="dp-risk-bar-wrap"><div class="dp-risk-bar-fill" style="width:${risk}%;background:${rc}"></div></div>
+        <span style="font-size:.85rem;font-weight:700;color:${rc};white-space:nowrap">${risk} / 100</span>
+      </div>
+      <div class="dp-mini-grid">
+        <div class="dp-mini-card">
+          <div class="dp-mini-label">Latency</div>
+          <div class="dp-mini-val" style="color:${(dev.latency_ms||0)>30?'var(--orange)':'var(--green)'}">${dev.latency_ms||'?'}<span style="font-size:.6rem;font-weight:400"> ms</span></div>
+        </div>
+        <div class="dp-mini-card">
+          <div class="dp-mini-label">↑ Upload</div>
+          <div class="dp-mini-val" style="color:var(--cyan)">${bwUp}<span style="font-size:.6rem;font-weight:400"> Mb/s</span></div>
+        </div>
+        <div class="dp-mini-card">
+          <div class="dp-mini-label">↓ Download</div>
+          <div class="dp-mini-val" style="color:var(--purple)">${bwDn}<span style="font-size:.6rem;font-weight:400"> Mb/s</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open Ports -->
+    <div class="dp-section">
+      <div class="dp-sec-title">Open Ports (${ports.length})</div>
+      ${ports.length === 0
+        ? '<div style="color:var(--muted);font-size:.75rem">No open ports detected</div>'
+        : `<table class="port-table">
+            <thead><tr><th>Port</th><th>Service</th><th>Banner</th><th>Status</th></tr></thead>
+            <tbody>${ports.map(([p, info]) => {
+              const isSus = (dev.suspicious_ports||[]).includes(p);
+              return `<tr>
+                <td style="font-family:var(--mono);font-weight:700;color:${isSus?'var(--red)':'var(--text)'}">${p}/tcp</td>
+                <td style="color:${isSus?'var(--orange)':'var(--muted)'}">${info.service}</td>
+                <td style="font-family:var(--mono);font-size:.6rem;color:var(--muted)">${info.banner||'—'}</td>
+                <td>${isSus
+                  ? '<span style="color:var(--red);font-size:.63rem;font-weight:700">⚠ RISKY</span>'
+                  : '<span style="color:var(--green);font-size:.63rem">✓ ok</span>'}</td>
+              </tr>`;
+            }).join('')}</tbody>
+           </table>`}
+    </div>
+
+    <!-- Vulnerabilities -->
+    <div class="dp-section">
+      <div class="dp-sec-title">Vulnerabilities (${vulns.length})</div>
+      ${vulns.length === 0
+        ? '<div style="color:var(--green);font-size:.75rem">✓ No known CVEs for this device</div>'
+        : vulns.map(v => `<div class="dp-vuln-item">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+              <span class="tag tag-cve">${v.cve}</span>
+              <span style="font-size:.63rem;font-weight:700;color:${SEV_COL[v.severity]||'var(--muted)'}">${v.severity?.toUpperCase()}</span>
+            </div>
+            <div style="font-size:.7rem;color:var(--muted);line-height:1.5">${v.description}</div>
+          </div>`).join('')}
+    </div>
+
+    <!-- Bandwidth sparkline -->
+    <div class="dp-section">
+      <div class="dp-sec-title">Bandwidth — 24h</div>
+      <svg id="dp-sparkline" viewBox="0 0 340 60" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sp-ga" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#06b6d4" stop-opacity=".35"/><stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="sp-gb" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".3"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path id="sp-up-fill" fill="url(#sp-ga)"/>
+        <path id="sp-up-line" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+        <path id="sp-dn-fill" fill="url(#sp-gb)"/>
+        <path id="sp-dn-line" fill="none" stroke="#8b5cf6" stroke-width="1.5"/>
+      </svg>
+      <div style="display:flex;gap:14px;margin-top:5px;font-size:.63rem;color:var(--muted)">
+        <span style="color:var(--cyan)">▬ Upload</span>
+        <span style="color:var(--purple)">▬ Download</span>
+        <span style="margin-left:auto">Total today: ${fmtBytes(bwTot * 1048576)}</span>
+      </div>
+    </div>
+
+    ${relatedTraffic.length > 0 ? `
+    <!-- Suspicious connections involving this device -->
+    <div class="dp-section">
+      <div class="dp-sec-title">⚠ Suspicious Outbound Connections</div>
+      ${relatedTraffic.map(c => `
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(26,58,92,.4);font-size:.7rem">
+          <span style="font-size:.9rem">${({Germany:'🇩🇪',Russia:'🇷🇺',Netherlands:'🇳🇱'})[c.country]||'🌐'}</span>
+          <div style="flex:1">
+            <div style="font-weight:600;color:var(--red)">${c.dst} :${c.port} <span style="color:var(--muted);font-weight:400">(${c.service})</span></div>
+            <div style="color:var(--muted);font-size:.63rem">${c.city}, ${c.country} · ${c.asn} ${c.org}</div>
+            ${c.threat ? `<div style="color:var(--red);font-size:.6rem;margin-top:1px">⚠ ${c.threat}</div>` : ''}
+          </div>
+          <div style="font-family:var(--mono);font-size:.63rem;color:var(--orange)">↑${fmtBytes(c.bytes_sent||0)}</div>
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+
+  drawSparkline(bwUp, bwDn);
+  id('dev-panel-overlay').classList.add('active');
+  requestAnimationFrame(() => id('dev-panel').classList.add('open'));
+}
+
+function closeDevPanel() {
+  id('dev-panel').classList.remove('open');
+  id('dev-panel-overlay').classList.remove('active');
+}
+
+function devAction(action, ip, idx) {
+  closeDevPanel();
+  if (action === 'trust') {
+    const dev = state.devices[idx];
+    if (dev) { dev.is_trusted = true; dev.is_new = false; dev.risk_score = Math.max(0, dev.risk_score - 20); }
+    renderDevices(); renderStats();
+    showToast('low', 'Device Trusted', `${ip} added to trusted list`);
+  } else if (action === 'block') {
+    state.devices.splice(idx, 1);
+    renderDevices(); renderStats();
+    showToast('high', 'Device Blocked', `${ip} removed from network view`);
+  } else if (action === 'rescan') {
+    showToast('low', 'Rescan Started', `Port scan initiated on ${ip}`);
+  }
+}
+
+function drawSparkline(bwUp, bwDn) {
+  const W = 340, H = 60, N = 24;
+  const upPts = [], dnPts = [];
+  for (let i = 0; i < N; i++) {
+    const hr = (new Date().getHours() - N + i + 24) % 24;
+    const f = hr < 6 ? 0.12 : hr < 9 ? 0.55 : hr < 18 ? 1.0 : 0.5;
+    upPts.push(Math.max(0.05, bwUp * f * (0.5 + Math.random())));
+    dnPts.push(Math.max(0.05, bwDn * f * (0.5 + Math.random())));
+  }
+  function toPath(pts, filled) {
+    const xs  = pts.map((_, i) => i / (N - 1) * W);
+    const max = Math.max(...pts, 0.1);
+    const ys  = pts.map(v => H - 4 - (v / max) * (H - 12));
+    let d = `M${xs[0]},${ys[0]}`;
+    for (let i = 1; i < N; i++) {
+      const mx = (xs[i-1] + xs[i]) / 2;
+      d += ` C${mx},${ys[i-1]} ${mx},${ys[i]} ${xs[i]},${ys[i]}`;
+    }
+    if (filled) d += ` L${W},${H} L0,${H} Z`;
+    return d;
+  }
+  [['sp-up-fill', upPts, true], ['sp-up-line', upPts, false],
+   ['sp-dn-fill', dnPts, true], ['sp-dn-line', dnPts, false]].forEach(([elId, pts, filled]) => {
+    const el = document.getElementById(elId);
+    if (el) el.setAttribute('d', toPath(pts, filled));
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
