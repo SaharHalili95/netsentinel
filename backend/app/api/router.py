@@ -6,6 +6,7 @@ from app.api.scans import router as scans_router
 from app.api.alerts import router as alerts_router
 from app.api.websocket import router as ws_router
 from app.api.demo import router as demo_router
+from app.api.compliance import router as compliance_router
 
 api_router = APIRouter()
 
@@ -15,3 +16,4 @@ api_router.include_router(scans_router, prefix="/scans", tags=["Scans"])
 api_router.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 api_router.include_router(ws_router, prefix="/ws", tags=["WebSocket"])
 api_router.include_router(demo_router, prefix="/demo", tags=["Demo"])
+api_router.include_router(compliance_router, prefix="/compliance", tags=["SOC2 Compliance"])
