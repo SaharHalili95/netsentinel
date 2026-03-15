@@ -485,6 +485,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
             World Map
           </div>
+          <div class="db-nav-item" onclick="showPage('topo',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="19" x2="19" y2="19"/></svg>
+            Topology
+          </div>
           <div class="db-nav-item" onclick="showPage('vulns',this)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             Vulnerabilities
@@ -635,6 +639,30 @@
           </div>
         </div>
 
+        <!-- TOPOLOGY PAGE -->
+        <div class="page" id="page-topo">
+          <div class="chart-card" style="padding:0;overflow:hidden;">
+            <div style="padding:11px 13px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+              <div style="font-size:.74rem;font-weight:600">Network Topology — Live Device Graph</div>
+              <div style="font-size:.63rem;color:var(--muted)">Click a device to inspect · Hover for details</div>
+            </div>
+            <canvas id="topo-canvas" style="display:block;width:100%"></canvas>
+            <div class="map-legend">
+              <span style="color:var(--primary2)">● Router / Gateway</span>
+              <span style="color:var(--green)">● Low Risk</span>
+              <span style="color:var(--yellow)">● Medium Risk</span>
+              <span style="color:var(--orange)">● High Risk</span>
+              <span style="color:var(--red)">● Critical</span>
+            </div>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+            <div class="stat-card"><div><div class="stat-label">Total Devices</div><div class="stat-val" id="t-total">8</div><div class="stat-sub">on network</div></div><div class="stat-icon i-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">High Risk</div><div class="stat-val" id="t-highrisk" style="color:var(--red)">2</div><div class="stat-sub">need attention</div></div><div class="stat-icon i-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Trusted</div><div class="stat-val" id="t-trusted" style="color:var(--green)">5</div><div class="stat-sub">verified devices</div></div><div class="stat-icon i-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+            <div class="stat-card"><div><div class="stat-label">Avg Risk</div><div class="stat-val" id="t-avgrisk">42</div><div class="stat-sub">risk score</div></div><div class="stat-icon i-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div>
+          </div>
+        </div>
+
         <!-- VULNERABILITIES PAGE -->
         <div class="page" id="page-vulns">
           <div class="chart-card">
@@ -733,6 +761,7 @@ cd netsentinel</div></div></div>
 
 <div id="toast-container"></div>
 <div id="map-tooltip"></div>
+<div id="topo-tooltip" style="position:fixed;display:none;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:.7rem;pointer-events:none;min-width:190px;max-width:270px;box-shadow:0 8px 28px rgba(0,0,0,.5);line-height:1.5;"></div>
 
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
@@ -816,6 +845,7 @@ function renderAll() {
   renderScans();
   renderAlertBadge();
   renderMapStats();
+  renderTopoStats();
 }
 
 function renderStats() {
@@ -1043,8 +1073,9 @@ function showPage(name, el) {
   document.querySelectorAll('.db-nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if (el) el.classList.add('active');
-  if (name === 'map') { mapActive = true;  initWorldMap(); }
-  else                { mapActive = false; if (mapAF) { cancelAnimationFrame(mapAF); mapAF = null; } }
+  if (name === 'map')       { mapActive = true;  topoActive = false; if (topoAF) { cancelAnimationFrame(topoAF); topoAF = null; } initWorldMap(); }
+  else if (name === 'topo') { topoActive = true; mapActive = false;  if (mapAF)  { cancelAnimationFrame(mapAF);  mapAF  = null; } initTopology(); }
+  else                      { mapActive = false; topoActive = false; if (mapAF)  { cancelAnimationFrame(mapAF);  mapAF  = null; } if (topoAF) { cancelAnimationFrame(topoAF); topoAF = null; } }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1600,6 +1631,201 @@ function renderMapStats() {
   if (el('m-threat'))    el('m-threat').textContent    = conns.filter(c=>c.sus).length;
   if (el('m-countries')) el('m-countries').textContent = countries.size;
   if (el('m-bytes'))     el('m-bytes').textContent     = fmtBytes(conns.reduce((n,c)=>n+(c.bytes_sent||0)+(c.bytes_recv||0),0));
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  NETWORK TOPOLOGY
+// ══════════════════════════════════════════════════════════════════════════════
+let topoActive = false, topoAF = null;
+let topoHover  = -1;
+const topoNodes = [];
+
+function riskColor(score) {
+  if (score >= 75) return '#ef4444';
+  if (score >= 50) return '#f97316';
+  if (score >= 25) return '#eab308';
+  return '#22c55e';
+}
+
+function buildTopoLayout(W, H) {
+  topoNodes.length = 0;
+  const devs = state.devices;
+  if (!devs.length) return;
+  const cx = W / 2, cy = H / 2;
+  const ring1Max = 8;
+  const ring1 = devs.slice(0, Math.min(devs.length, ring1Max));
+  const ring2 = devs.slice(ring1Max);
+  const r1 = Math.min(cx, cy) * 0.52;
+  const r2 = Math.min(cx, cy) * 0.82;
+  ring1.forEach((dev, i) => {
+    const angle = (i / ring1.length) * Math.PI * 2 - Math.PI / 2;
+    topoNodes.push({
+      x: cx + Math.cos(angle) * r1, y: cy + Math.sin(angle) * r1,
+      devIdx: i, r: 16, col: riskColor(dev.risk_score || 0),
+      label: (dev.hostname || dev.ip_address).split('.')[0]
+    });
+  });
+  ring2.forEach((dev, i) => {
+    const offset = ring1.length ? Math.PI / ring1.length : 0;
+    const angle = (i / ring2.length) * Math.PI * 2 - Math.PI / 2 + offset;
+    topoNodes.push({
+      x: cx + Math.cos(angle) * r2, y: cy + Math.sin(angle) * r2,
+      devIdx: ring1Max + i, r: 14, col: riskColor(dev.risk_score || 0),
+      label: (dev.hostname || dev.ip_address).split('.')[0]
+    });
+  });
+}
+
+function initTopology() {
+  const canvas = document.getElementById('topo-canvas');
+  if (!canvas) return;
+  const W = canvas.parentElement.clientWidth || 760;
+  const H = Math.round(Math.min(W * 0.52, 380));
+  canvas.width = W; canvas.height = H; canvas.style.height = H + 'px';
+  buildTopoLayout(W, H);
+  renderTopoStats();
+  const ctx = canvas.getContext('2d');
+  if (topoAF) cancelAnimationFrame(topoAF);
+  function loop(t) { if (!topoActive) return; drawTopology(ctx, W, H, t); topoAF = requestAnimationFrame(loop); }
+  topoAF = requestAnimationFrame(loop);
+
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+    const cx = canvas.width / 2, cy = canvas.height / 2;
+    let found = -1;
+    if (Math.hypot(mx - cx, my - cy) <= 22) { found = -2; }
+    else { topoNodes.forEach((n, i) => { if (Math.hypot(mx - n.x, my - n.y) <= n.r + 4) found = i; }); }
+    topoHover = found;
+    canvas.style.cursor = found !== -1 ? 'pointer' : 'default';
+    const tt = document.getElementById('topo-tooltip');
+    if (!tt) return;
+    if (found === -1) { tt.style.display = 'none'; return; }
+    if (found === -2) {
+      tt.innerHTML = `<div style="font-weight:700;color:var(--primary2);margin-bottom:4px">&#x1F310; Gateway / Router</div><div style="color:var(--muted)">192.168.1.1</div><div style="color:var(--green);font-size:.63rem;margin-top:3px">&#x2713; Trusted &mdash; Network Core</div>`;
+    } else {
+      const dev = state.devices[topoNodes[found].devIdx];
+      if (!dev) { tt.style.display = 'none'; return; }
+      const rCol = riskColor(dev.risk_score || 0);
+      tt.innerHTML = `<div style="font-weight:700;margin-bottom:4px">${dev.hostname || dev.ip_address}</div><div style="color:var(--muted);font-size:.65rem">${dev.ip_address} &middot; ${dev.mac_address || '&ndash;'}</div><div style="font-size:.65rem;margin-top:4px">${dev.os_guess || dev.device_type || 'Unknown'} &middot; <span style="color:${rCol}">Risk ${dev.risk_score || 0}</span></div>${dev.open_ports && dev.open_ports.length ? `<div style="font-size:.63rem;color:var(--muted);margin-top:3px">Ports: ${dev.open_ports.slice(0,5).map(p=>p.port).join(', ')}${dev.open_ports.length > 5 ? '&hellip;' : ''}</div>` : ''}<div style="font-size:.6rem;color:var(--muted);margin-top:3px">Click to inspect &rarr;</div>`;
+    }
+    tt.style.display = 'block';
+    tt.style.left = (e.clientX + 14) + 'px';
+    tt.style.top  = (e.clientY - 10) + 'px';
+  };
+  canvas.onmouseleave = () => {
+    topoHover = -1;
+    const tt = document.getElementById('topo-tooltip');
+    if (tt) tt.style.display = 'none';
+  };
+  canvas.onclick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+    let clicked = -1;
+    topoNodes.forEach((n, i) => { if (Math.hypot(mx - n.x, my - n.y) <= n.r + 4) clicked = i; });
+    if (clicked >= 0) openDevPanel(topoNodes[clicked].devIdx);
+  };
+}
+
+function drawTopology(ctx, W, H, t) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a1628';
+  ctx.fillRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2, ms = t / 1000;
+
+  // Edges
+  topoNodes.forEach((n, i) => {
+    const dev = state.devices[n.devIdx];
+    const sus = dev && dev.risk_score >= 75;
+    ctx.save();
+    ctx.strokeStyle = sus ? 'rgba(239,68,68,0.25)' : 'rgba(59,130,246,0.18)';
+    ctx.lineWidth   = sus ? 1.5 : 1;
+    if (sus) ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(n.x, n.y); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+    // Travelling packet dot
+    const phase = ((ms * (sus ? 0.6 : 0.35) + i * 0.37) % 1);
+    ctx.beginPath();
+    ctx.arc(cx + (n.x - cx) * phase, cy + (n.y - cy) * phase, 2, 0, Math.PI * 2);
+    ctx.fillStyle = sus ? 'rgba(239,68,68,0.7)' : 'rgba(96,165,250,0.7)';
+    ctx.fill();
+  });
+
+  // Router node
+  const rPulse = 1 + 0.06 * Math.sin(ms * 2.5);
+  const rR = 22 * rPulse;
+  const rGrad = ctx.createRadialGradient(cx, cy, rR * 0.3, cx, cy, rR * 2.2);
+  rGrad.addColorStop(0, 'rgba(59,130,246,0.35)'); rGrad.addColorStop(1, 'rgba(59,130,246,0)');
+  ctx.beginPath(); ctx.arc(cx, cy, rR * 2.2, 0, Math.PI * 2); ctx.fillStyle = rGrad; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, rR, 0, Math.PI * 2);
+  ctx.fillStyle = topoHover === -2 ? '#2563eb' : '#1d4ed8';
+  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('\u2295', cx, cy);
+  ctx.font = '600 9px Inter,sans-serif'; ctx.fillStyle = 'rgba(148,163,184,.9)';
+  ctx.fillText('192.168.1.1', cx, cy + rR + 11);
+
+  // Device nodes
+  topoNodes.forEach((n, i) => {
+    const dev = state.devices[n.devIdx];
+    if (!dev) return;
+    const hovered = topoHover === i;
+    const r = n.r * (hovered ? 1.2 : 1);
+    const sus = dev.risk_score >= 75;
+
+    // Danger pulse ring
+    if (sus) {
+      const pulse = 0.5 + 0.5 * Math.abs(Math.sin(ms * 3 + i));
+      ctx.beginPath(); ctx.arc(n.x, n.y, r + 8, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(239,68,68,${pulse * 0.5})`; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // Glow
+    const GLOW_MAP = {'#ef4444':'rgba(239,68,68,0.3)','#f97316':'rgba(249,115,22,0.3)','#eab308':'rgba(234,179,8,0.25)','#22c55e':'rgba(34,197,94,0.2)'};
+    const gGrad = ctx.createRadialGradient(n.x, n.y, r * 0.3, n.x, n.y, r * 2);
+    gGrad.addColorStop(0, GLOW_MAP[n.col] || 'rgba(59,130,246,0.2)'); gGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(n.x, n.y, r * 2, 0, Math.PI * 2); ctx.fillStyle = gGrad; ctx.fill();
+
+    // Circle
+    ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fillStyle   = hovered ? n.col : n.col + '33';
+    ctx.strokeStyle = n.col; ctx.lineWidth = hovered ? 2.5 : 1.5;
+    ctx.fill(); ctx.stroke();
+
+    // Trusted badge
+    if (dev.is_trusted) {
+      ctx.beginPath(); ctx.arc(n.x + r * 0.65, n.y - r * 0.65, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#22c55e'; ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '600 6px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('\u2713', n.x + r * 0.65, n.y - r * 0.65);
+    }
+
+    // Risk score inside node
+    ctx.font = `600 ${r > 15 ? 9 : 8}px Inter,sans-serif`;
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(dev.risk_score || 0, n.x, n.y);
+
+    // Label below
+    ctx.font = '600 8.5px Inter,sans-serif';
+    ctx.fillStyle = hovered ? '#e2e8f0' : 'rgba(148,163,184,.85)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    const lbl = n.label.length > 12 ? n.label.slice(0, 11) + '\u2026' : n.label;
+    ctx.fillText(lbl, n.x, n.y + r + 4);
+  });
+}
+
+function renderTopoStats() {
+  const devs = state.devices;
+  const highRisk = devs.filter(d => (d.risk_score || 0) >= 60).length;
+  const trusted  = devs.filter(d => d.is_trusted).length;
+  const avg = devs.length ? Math.round(devs.reduce((s, d) => s + (d.risk_score || 0), 0) / devs.length) : 0;
+  const el = (x) => document.getElementById(x);
+  if (el('t-total'))    el('t-total').textContent    = devs.length;
+  if (el('t-highrisk')) el('t-highrisk').textContent = highRisk;
+  if (el('t-trusted'))  el('t-trusted').textContent  = trusted;
+  if (el('t-avgrisk'))  el('t-avgrisk').textContent  = avg;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
