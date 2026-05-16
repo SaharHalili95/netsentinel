@@ -1,50 +1,38 @@
 # NetSentinel
 
-A full-stack network monitoring and intrusion detection platform. Scans your local network, detects suspicious activity in real time, and provides a SOC 2-aligned compliance dashboard.
+Production-grade network security monitoring platform with automated device discovery, live traffic capture, real-time alerts, and SOC 2 compliance tracking.
+
+**[Live Demo](https://saharhalili95.github.io/netsentinel/)**
+
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-async-green)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
 
 ## Features
 
-- **Device Discovery** - ARP scan to find all devices on the network with MAC, IP, and vendor info
+- **Automated Device Discovery** - ARP + nmap scans with MAC address, IP, and vendor info
 - **Port Scanning** - Detect open ports per device and flag high-risk services
-- **Traffic Analysis** - Log and visualize inbound/outbound traffic per device
-- **Anomaly Detection** - Automatically flag suspicious ports, watchlist country connections, and traffic spikes
-- **Real-Time Alerts** - WebSocket-powered live alert feed with severity levels (critical / high / medium / low)
+- **Live Traffic Capture** - Scapy-powered packet capture with inbound/outbound logging per device
+- **Anomaly Detection** - Flag suspicious ports, watchlist country connections, and traffic spikes
+- **Real-Time Alerts** - WebSocket-powered alert feed with severity levels and full lifecycle: open -> acknowledged -> resolved
+- **GeoIP World Map** - Visualize where network connections are originating from or going to
 - **Network Topology Graph** - Visual map of device relationships on the network
-- **SOC 2 Compliance Module** - Daily automated checks for access control, encryption, logging, and incident response
-- **Device Detail Panel** - Slide-over panel with per-device traffic history and open ports
+- **SOC 2 Compliance Module** - Daily automated checks across CC7.1, CC7.2, CC7.3, CC6.1, and A1.1
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React, TypeScript, Next.js, Tailwind CSS |
+| Frontend | React, TypeScript, Next.js 14, Tailwind CSS |
 | Backend | FastAPI (async), Python 3.12 |
 | Database | PostgreSQL 16 + SQLAlchemy (async) |
+| Cache | Redis |
 | Task Queue | APScheduler |
 | Real-Time | WebSocket (native FastAPI) |
 | Infrastructure | Docker, Docker Compose |
 | Network | Scapy, python-nmap, GeoIP2 |
-| Migrations | Alembic |
-
-## Architecture
-
-```
-┌──────────────────┐   WebSocket/REST   ┌──────────────────────────────┐
-│   Next.js Frontend│ ◀────────────────▶ │       FastAPI Backend         │
-│                  │                    │                              │
-│  Dashboard       │                    │  /devices  - device registry │
-│  Network Map     │                    │  /scans    - discovery scans  │
-│  Alerts Feed     │                    │  /alerts   - alert management │
-│  Device Detail   │                    │  /ws       - real-time feed   │
-│  SOC2 Compliance │                    │  /compliance - SOC2 checks    │
-└──────────────────┘                    └──────────┬───────────────────┘
-                                                   │
-                              ┌────────────────────┴──────────────────┐
-                              │           PostgreSQL                   │
-                              │  devices / scans / alerts /            │
-                              │  traffic_logs / soc2_checks            │
-                              └───────────────────────────────────────┘
-```
+| Testing | pytest |
 
 ## Getting Started
 
@@ -58,42 +46,40 @@ A full-stack network monitoring and intrusion detection platform. Scans your loc
 ```bash
 git clone https://github.com/SaharHalili95/netsentinel.git
 cd netsentinel
-cp .env.example .env   # edit DB_PASSWORD and other vars
+cp .env.example .env
 docker compose up --build
 ```
 
 - Frontend: http://localhost:3000
 - Backend API docs: http://localhost:8000/docs
 
-### Local Development
+> Note: Port scanning and ARP discovery require NET_RAW and NET_ADMIN capabilities (root or Docker with cap_add).
 
-**Backend:**
-```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-cp .env.example .env
-uvicorn app.main:app --reload
+## Alert Lifecycle
+
+```
+open  ->  acknowledged  ->  resolved
 ```
 
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-> Note: Port scanning and ARP discovery require `NET_RAW` and `NET_ADMIN` capabilities (root or Docker with `cap_add`).
+Each alert carries a severity level (critical / high / medium / low) and is pushed in real time to all connected clients via WebSocket.
 
 ## Anomaly Detection Rules
 
-The anomaly detector (`services/anomaly_detector.py`) runs on a schedule and checks for:
-
 | Rule | Severity | Description |
 |------|----------|-------------|
-| Suspicious port | High | Connection to known attack ports (445, 3389, 4444, 31337…) |
+| Suspicious port | High | Connection to known attack ports (445, 3389, 4444, 31337...) |
 | Watchlist country | Medium | Traffic to/from Russia, China, North Korea, Iran |
 | Traffic spike | Medium | Device with >1,000 connections in the last hour |
+
+## SOC 2 Compliance Controls
+
+| Control | Category | Description |
+|---------|----------|-------------|
+| CC6.1 | Logical Access | Access control and authentication checks |
+| CC7.1 | System Monitoring | Continuous monitoring of system activity |
+| CC7.2 | Anomaly Evaluation | Evaluation of detected anomalies |
+| CC7.3 | Incident Response | Incident response readiness and logging |
+| A1.1 | Availability | System availability and uptime tracking |
 
 ## API Endpoints
 
