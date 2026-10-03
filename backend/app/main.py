@@ -19,10 +19,12 @@ async def lifespan(app: FastAPI):
     if not settings.api_key:
         settings.api_key = secrets.token_urlsafe(32)
         logger.warning(
-            "No API_KEY configured - generated one for this run. "
-            "Set API_KEY in the environment for a stable key across restarts: %s",
-            settings.api_key,
+            "No API_KEY configured - generated one for this run (printed to "
+            "stdout below, not to the structured log). The frontend needs the "
+            "same value in NEXT_PUBLIC_API_KEY or its scan/edit/delete actions "
+            "will 401. Set API_KEY explicitly for a stable key across restarts."
         )
+        print(f"[netsentinel] Generated API_KEY for this run: {settings.api_key}")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     start_scheduler()

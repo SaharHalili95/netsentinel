@@ -6,6 +6,14 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// POST /api/scans and PATCH/DELETE /api/devices require this (see
+// backend/app/security.py). Must match the backend's API_KEY env var -
+// if the backend auto-generated one at startup instead, these calls will
+// 401 until API_KEY is set explicitly for both services.
+if (process.env.NEXT_PUBLIC_API_KEY) {
+  api.defaults.headers.common["X-API-Key"] = process.env.NEXT_PUBLIC_API_KEY;
+}
+
 // Dashboard
 export const fetchDashboard = () =>
   api.get<DashboardData>("/api/dashboard").then((r) => r.data);
