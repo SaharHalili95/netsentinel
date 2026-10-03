@@ -1,12 +1,29 @@
+import ipaddress
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class ScanCreate(BaseModel):
     scan_type: str = "discovery"  # discovery, port_scan, full
     target_network: str | None = None
+
+    @field_validator("target_network")
+    @classmethod
+    def validate_target_network(cls, value: str | None) -> str | None:
+        """Reject anything that isn't a real CIDR network before it ever
+        reaches a subprocess call to nmap (see services/device_discovery.py).
+        """
+        if value is None:
+            return value
+        try:
+            ipaddress.ip_network(value, strict=False)
+        except ValueError:
+            raise ValueError(
+                f"target_network must be a valid CIDR network (e.g. 192.168.1.0/24), got: {value!r}"
+            )
+        return value
 
 
 class ScanResponse(BaseModel):

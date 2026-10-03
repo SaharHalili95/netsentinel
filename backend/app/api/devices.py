@@ -8,6 +8,7 @@ from app.database import get_db
 from app.models.device import Device
 from app.models.scan import ScanResult
 from app.schemas.device import DeviceResponse, DeviceUpdate, DeviceWithPorts
+from app.security import require_api_key
 
 router = APIRouter()
 
@@ -50,7 +51,7 @@ async def get_device(device_id: UUID, db: AsyncSession = Depends(get_db)):
     )
 
 
-@router.patch("/{device_id}", response_model=DeviceResponse)
+@router.patch("/{device_id}", response_model=DeviceResponse, dependencies=[Depends(require_api_key)])
 async def update_device(
     device_id: UUID,
     data: DeviceUpdate,
@@ -70,7 +71,7 @@ async def update_device(
     return device
 
 
-@router.delete("/{device_id}")
+@router.delete("/{device_id}", dependencies=[Depends(require_api_key)])
 async def delete_device(device_id: UUID, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Device).where(Device.id == device_id))
     device = result.scalar_one_or_none()

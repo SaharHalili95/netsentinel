@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db, async_session
 from app.models.scan import Scan, ScanResult
 from app.schemas.scan import ScanCreate, ScanResponse, ScanResultResponse
+from app.security import require_api_key
 from app.services.scanner import run_discovery_scan, run_port_scan
 
 router = APIRouter()
@@ -25,7 +26,7 @@ async def list_scans(
     return result.scalars().all()
 
 
-@router.post("", response_model=ScanResponse)
+@router.post("", response_model=ScanResponse, dependencies=[Depends(require_api_key)])
 async def create_scan(
     data: ScanCreate,
     background_tasks: BackgroundTasks,
