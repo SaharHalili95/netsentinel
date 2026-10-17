@@ -1,6 +1,6 @@
 import logging
 import subprocess
-import re
+import xml.etree.ElementTree as ET
 
 from app.config import settings
 
@@ -28,36 +28,7 @@ def arp_scan(network: str | None = None) -> list[dict]:
             logger.error(f"nmap scan failed: {result.stderr}")
             return devices
 
-        xml_output = result.stdout
-        # Parse nmap XML output
-        host_blocks = re.findall(r"<host.*?</host>", xml_output, re.DOTALL)
-
-        for block in host_blocks:
-            device = {}
-
-            # IP address
-            ip_match = re.search(r'<address addr="([^"]+)" addrtype="ipv4"', block)
-            if ip_match:
-                device["ip_address"] = ip_match.group(1)
-
-            # MAC address and vendor
-            mac_match = re.search(r'<address addr="([^"]+)" addrtype="mac"(?:\s+vendor="([^"]*)")?', block)
-            if mac_match:
-                device["mac_address"] = mac_match.group(1)
-                device["vendor"] = mac_match.group(2) or None
-
-            # Hostname
-            hostname_match = re.search(r'<hostname name="([^"]+)"', block)
-            if hostname_match:
-                device["hostname"] = hostname_match.group(1)
-
-            # Status
-            status_match = re.search(r'<status state="(\w+)"', block)
-            if status_match:
-                device["is_online"] = status_match.group(1) == "up"
-
-            if "ip_address" in device:
-                devices.append(device)
+        devices = parse_hosts_xml(result.stdout)
 
     except subprocess.TimeoutExpired:
         logger.error("ARP scan timed out")
@@ -66,6 +37,37 @@ def arp_scan(network: str | None = None) -> list[dict]:
         # Fallback: return mock data for development
         devices = _mock_devices()
 
+    return devices
+
+
+def parse_hosts_xml(xml_output: str) -> list[dict]:
+    """Extract hosts from nmap's -oX output. Only top-level <host> elements count, not <hosthint>."""
+    try:
+        root = ET.fromstring(xml_output)
+    except ET.ParseError:
+        logger.error("Could not parse nmap XML output")
+        return []
+
+    devices = []
+    for host in root.findall("host"):
+        device = {}
+        for address in host.findall("address"):
+            if address.get("addrtype") == "ipv4":
+                device["ip_address"] = address.get("addr")
+            elif address.get("addrtype") == "mac":
+                device["mac_address"] = address.get("addr")
+                device["vendor"] = address.get("vendor") or None
+
+        hostname = host.find("hostnames/hostname")
+        if hostname is not None:
+            device["hostname"] = hostname.get("name")
+
+        status = host.find("status")
+        if status is not None:
+            device["is_online"] = status.get("state") == "up"
+
+        if "ip_address" in device:
+            devices.append(device)
     return devices
 
 
