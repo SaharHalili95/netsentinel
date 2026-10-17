@@ -1,6 +1,6 @@
 import logging
 import subprocess
-import re
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
@@ -24,28 +24,7 @@ def scan_ports(ip_address: str, ports: str | None = None) -> dict:
             logger.error(f"Port scan failed for {ip_address}: {result.stderr}")
             return open_ports
 
-        xml_output = result.stdout
-        port_blocks = re.findall(r"<port.*?</port>", xml_output, re.DOTALL)
-
-        for block in port_blocks:
-            port_match = re.search(r'portid="(\d+)" protocol="(\w+)"', block)
-            state_match = re.search(r'<state state="(\w+)"', block)
-            service_match = re.search(r'<service name="([^"]*)"(?:\s+product="([^"]*)")?(?:\s+version="([^"]*)")?', block)
-
-            if port_match and state_match and state_match.group(1) == "open":
-                port_id = int(port_match.group(1))
-                protocol = port_match.group(2)
-                service_name = service_match.group(1) if service_match else "unknown"
-                product = service_match.group(2) if service_match else None
-                version = service_match.group(3) if service_match else None
-
-                open_ports[str(port_id)] = {
-                    "protocol": protocol,
-                    "service": service_name,
-                    "product": product,
-                    "version": version,
-                    "state": "open",
-                }
+        open_ports = parse_nmap_xml(result.stdout)
 
     except subprocess.TimeoutExpired:
         logger.error(f"Port scan timed out for {ip_address}")
@@ -53,6 +32,30 @@ def scan_ports(ip_address: str, ports: str | None = None) -> dict:
         logger.error("nmap not found")
         open_ports = _mock_ports(ip_address)
 
+    return open_ports
+
+
+def parse_nmap_xml(xml_output: str) -> dict:
+    """Extract open ports from nmap's -oX output, regardless of attribute order."""
+    open_ports = {}
+    try:
+        root = ET.fromstring(xml_output)
+    except ET.ParseError:
+        logger.error("Could not parse nmap XML output")
+        return open_ports
+
+    for port in root.iter("port"):
+        state = port.find("state")
+        if state is None or state.get("state") != "open":
+            continue
+        service = port.find("service")
+        open_ports[port.get("portid")] = {
+            "protocol": port.get("protocol"),
+            "service": service.get("name", "unknown") if service is not None else "unknown",
+            "product": service.get("product") if service is not None else None,
+            "version": service.get("version") if service is not None else None,
+            "state": "open",
+        }
     return open_ports
 
 
