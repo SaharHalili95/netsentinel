@@ -5,16 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+export type Locale = "en" | "he";
+
+const INTL_LOCALE: Record<Locale, string> = { en: "en-IL", he: "he-IL" };
+
+export function formatNumber(n: number, locale: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 1 }).format(n);
 }
 
-export function formatDate(date: string): string {
-  return new Date(date).toLocaleString("en-IL", {
+export function formatBytes(bytes: number, locale: Locale): string {
+  if (bytes <= 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+  return `${formatNumber(bytes / Math.pow(k, i), locale)} ${sizes[i]}`;
+}
+
+export function formatDate(date: string, locale: Locale): string {
+  return new Date(date).toLocaleString(INTL_LOCALE[locale], {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -22,12 +30,14 @@ export function formatDate(date: string): string {
   });
 }
 
-export function timeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
+export function timeAgo(date: string, locale: Locale): string {
+  const seconds = Math.round((new Date(date).getTime() - Date.now()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(INTL_LOCALE[locale], { numeric: "auto" });
+  const abs = Math.abs(seconds);
+  if (abs < 60) return rtf.format(0, "second");
+  if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+  if (abs < 86400) return rtf.format(Math.round(seconds / 3600), "hour");
+  return rtf.format(Math.round(seconds / 86400), "day");
 }
 
 export function severityColor(severity: string): string {
