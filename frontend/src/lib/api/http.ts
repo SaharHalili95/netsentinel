@@ -1,5 +1,14 @@
 import axios from "axios";
-import type { DashboardData, Device, Scan, Alert } from "@/types";
+import type {
+  Alert,
+  ComplianceHistoryDay,
+  ComplianceStatus,
+  DashboardData,
+  Device,
+  RequiredCheck,
+  Scan,
+  TrafficSummary,
+} from "@/types";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
@@ -51,4 +60,19 @@ export const updateAlert = (id: string, data: { status: string }) =>
 export const resolveAllAlerts = () =>
   api.post("/api/alerts/resolve-all").then((r) => r.data);
 
-export default api;
+// Traffic
+export const fetchTrafficSummary = (hours = 24) =>
+  api.get<TrafficSummary>("/api/traffic/summary", { params: { hours } }).then((r) => r.data);
+
+// SOC 2 compliance
+export const fetchComplianceStatus = () =>
+  api.get<ComplianceStatus>("/api/compliance/status").then((r) => r.data);
+
+export const fetchComplianceHistory = (days = 30) =>
+  api.get<ComplianceHistoryDay[]>("/api/compliance/history", { params: { days } }).then((r) => r.data);
+
+export const fetchRequiredChecks = () =>
+  api.get<RequiredCheck[]>("/api/compliance/checks/required").then((r) => r.data);
+
+export const fetchCriteria = () =>
+  api.get<Record<string, string>>("/api/compliance/criteria").then((r) => r.data);
