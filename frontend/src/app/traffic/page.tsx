@@ -1,206 +1,221 @@
 "use client";
 
-import { useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { useRef, useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Globe, AlertTriangle, Activity } from "lucide-react";
-import { cn, formatBytes } from "@/lib/utils";
+import PageHeader from "@/components/ui/PageHeader";
+import ErrorState from "@/components/ui/ErrorState";
+import ChartFigure from "@/components/ui/ChartFigure";
+import Ltr from "@/components/ui/Ltr";
+import { COLORS, axisColor, gridColor, tooltipStyle } from "@/components/dashboard/chartTheme";
+import { fetchTrafficSummary } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { useAsync } from "@/lib/useAsync";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import type { TrafficSummary } from "@/types";
 
-// Mock traffic data
-const protocolData = [
-  { name: "TCP", value: 8547, fill: "#3b82f6" },
-  { name: "UDP", value: 2341, fill: "#8b5cf6" },
-  { name: "ICMP", value: 156, fill: "#06b6d4" },
-];
-
-const topDestinations = [
-  { ip: "8.8.8.8", country: "US", city: "Mountain View", bytes: 45200000, connections: 1250, service: "Google DNS" },
-  { ip: "151.101.1.140", country: "US", city: "San Francisco", bytes: 32100000, connections: 890, service: "Reddit/Fastly" },
-  { ip: "140.82.121.4", country: "US", city: "San Francisco", bytes: 28500000, connections: 567, service: "GitHub" },
-  { ip: "17.253.144.10", country: "US", city: "Cupertino", bytes: 21800000, connections: 432, service: "Apple" },
-  { ip: "54.230.210.45", country: "US", city: "Ashburn", bytes: 18900000, connections: 321, service: "AWS CloudFront" },
-  { ip: "185.220.101.1", country: "DE", city: "Berlin", bytes: 2400000, connections: 12, service: "Unknown" },
-];
-
-const geoData = [
-  { country: "United States", connections: 3460, bytes: 156000000, flag: "US" },
-  { country: "Germany", connections: 12, bytes: 2400000, flag: "DE" },
-  { country: "Australia", connections: 89, bytes: 8900000, flag: "AU" },
-  { country: "Japan", connections: 45, bytes: 5600000, flag: "JP" },
-  { country: "United Kingdom", connections: 67, bytes: 7800000, flag: "GB" },
-];
-
-const COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4", "#10b981", "#f59e0b"];
+const TABS = [
+  { key: "overview", icon: Activity },
+  { key: "geo", icon: Globe },
+  { key: "suspicious", icon: AlertTriangle },
+] as const;
+type Tab = (typeof TABS)[number]["key"];
 
 export default function TrafficPage() {
-  const [tab, setTab] = useState<"overview" | "geo" | "suspicious">("overview");
+  const { t } = useI18n();
+  const { data, error, loading, reload } = useAsync(() => fetchTrafficSummary(24));
+  const [tab, setTab] = useState<Tab>("overview");
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const onTabKey = (e: React.KeyboardEvent, index: number) => {
+    const forward = document.documentElement.dir === "rtl" ? "ArrowLeft" : "ArrowRight";
+    const back = forward === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
+    if (e.key !== forward && e.key !== back) return;
+    e.preventDefault();
+    const next = (index + (e.key === forward ? 1 : TABS.length - 1)) % TABS.length;
+    setTab(TABS[next].key);
+    tabRefs.current[next]?.focus();
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Traffic Analysis</h1>
-        <p className="text-sm text-muted-foreground">
-          Network traffic monitoring and geographic analysis
-        </p>
-      </div>
+      <PageHeader title={t("traffic.title")} subtitle={t("traffic.subtitle")} onRefresh={reload} loading={loading} />
+      {error ? <ErrorState onRetry={reload} /> : null}
 
-      {/* Tabs */}
-      <div className="flex gap-2">
-        {([
-          { key: "overview", label: "Overview", icon: Activity },
-          { key: "geo", label: "Geographic", icon: Globe },
-          { key: "suspicious", label: "Suspicious", icon: AlertTriangle },
-        ] as const).map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-              tab === t.key
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-accent"
+      {data && (
+        <>
+          <div role="tablist" aria-label={t("traffic.tabs")} className="flex flex-wrap gap-2">
+            {TABS.map((item, i) => (
+              <button
+                key={item.key}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
+                id={`tab-${item.key}`}
+                role="tab"
+                type="button"
+                aria-selected={tab === item.key}
+                aria-controls={`panel-${item.key}`}
+                tabIndex={tab === item.key ? 0 : -1}
+                onClick={() => setTab(item.key)}
+                onKeyDown={(e) => onTabKey(e, i)}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                  tab === item.key ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-accent"
+                )}
+              >
+                <item.icon className="h-4 w-4" aria-hidden="true" />
+                {t(`traffic.${item.key}`)}
+              </button>
+            ))}
+          </div>
+
+          <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} tabIndex={0}>
+            {data.total_bytes === 0 ? (
+              <p className="rounded-xl border border-border p-8 text-center text-muted-foreground">{t("traffic.empty")}</p>
+            ) : tab === "overview" ? (
+              <Overview data={data} />
+            ) : tab === "geo" ? (
+              <ByCountry data={data} />
+            ) : (
+              <Suspicious data={data} />
             )}
-          >
-            <t.icon className="h-4 w-4" />
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === "overview" && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Protocol Distribution */}
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="mb-4 text-sm font-semibold text-foreground">
-              Protocol Distribution
-            </h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie data={protocolData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
-                  {protocolData.map((entry, i) => (
-                    <Cell key={i} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "hsl(224, 71%, 6%)", border: "1px solid hsl(216, 34%, 17%)", borderRadius: "8px", color: "hsl(213, 31%, 91%)" }} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex justify-center gap-6">
-              {protocolData.map((p) => (
-                <div key={p.name} className="flex items-center gap-2 text-xs">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: p.fill }} />
-                  <span className="text-muted-foreground">{p.name}: {p.value.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
           </div>
-
-          {/* Top Destinations */}
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="mb-4 text-sm font-semibold text-foreground">
-              Top Destinations
-            </h3>
-            <div className="space-y-3">
-              {topDestinations.map((dest) => (
-                <div key={dest.ip} className="flex items-center justify-between rounded-lg border border-border/50 bg-accent/20 p-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm text-foreground">{dest.ip}</span>
-                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">{dest.country}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{dest.service} &bull; {dest.city}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-foreground">{formatBytes(dest.bytes)}</p>
-                    <p className="text-xs text-muted-foreground">{dest.connections} conn.</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {tab === "geo" && (
-        <div className="rounded-xl border border-border bg-card p-5">
-          <h3 className="mb-4 text-sm font-semibold text-foreground">
-            Traffic by Country
-          </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={geoData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(216, 34%, 17%)" />
-              <XAxis type="number" stroke="hsl(215, 20%, 45%)" fontSize={10} />
-              <YAxis dataKey="country" type="category" stroke="hsl(215, 20%, 45%)" fontSize={11} width={120} />
-              <Tooltip contentStyle={{ backgroundColor: "hsl(224, 71%, 6%)", border: "1px solid hsl(216, 34%, 17%)", borderRadius: "8px", color: "hsl(213, 31%, 91%)" }} />
-              <Bar dataKey="connections" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-
-          {/* Country Table */}
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="px-4 py-2">Country</th>
-                  <th className="px-4 py-2">Connections</th>
-                  <th className="px-4 py-2">Data Transfer</th>
-                </tr>
-              </thead>
-              <tbody>
-                {geoData.map((row) => (
-                  <tr key={row.country} className="border-b border-border/50">
-                    <td className="px-4 py-2 text-foreground">{row.flag} {row.country}</td>
-                    <td className="px-4 py-2 text-muted-foreground">{row.connections.toLocaleString()}</td>
-                    <td className="px-4 py-2 text-muted-foreground">{formatBytes(row.bytes)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {tab === "suspicious" && (
-        <div className="space-y-4">
-          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-red-500">
-              <AlertTriangle className="h-4 w-4" />
-              Suspicious Connections
-            </h3>
-            <div className="space-y-3">
-              {topDestinations.filter((d) => d.service === "Unknown").map((dest) => (
-                <div key={dest.ip} className="flex items-center justify-between rounded-lg border border-red-500/20 bg-red-500/10 p-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-sm font-medium text-foreground">{dest.ip}</span>
-                      <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] text-red-500">{dest.country}</span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Unknown service • {dest.connections} connections • {dest.city}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-red-400">{formatBytes(dest.bytes)}</p>
-                    <p className="text-xs text-muted-foreground">Port 4444</p>
-                  </div>
-                </div>
-              ))}
-              {topDestinations.filter((d) => d.service === "Unknown").length === 0 && (
-                <p className="text-center text-sm text-muted-foreground">No suspicious connections detected</p>
-              )}
-            </div>
-          </div>
-        </div>
+        </>
       )}
     </div>
+  );
+}
+
+function Overview({ data }: { data: TrafficSummary }) {
+  const { t, fmt } = useI18n();
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <ChartFigure
+        title={t("traffic.protocols")}
+        columns={[t("traffic.protocols"), t("traffic.connections")]}
+        rows={data.protocols.map((p) => [p.protocol, p.connections])}
+      >
+        <ResponsiveContainer width="100%" height={220}>
+          <PieChart>
+            <Pie data={data.protocols} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="connections" nameKey="protocol" paddingAngle={4}>
+              {data.protocols.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip contentStyle={tooltipStyle} />
+          </PieChart>
+        </ResponsiveContainer>
+        <ul className="flex flex-wrap justify-center gap-4">
+          {data.protocols.map((p, i) => (
+            <li key={p.protocol} className="flex items-center gap-2 text-xs">
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+              <span className="text-muted-foreground">
+                {p.protocol}: {fmt.number(p.connections)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </ChartFigure>
+
+      <section aria-labelledby="top-destinations" className="rounded-xl border border-border bg-card p-5">
+        <h2 id="top-destinations" className="mb-4 text-sm font-semibold text-foreground">{t("traffic.topDestinations")}</h2>
+        <ul className="space-y-2">
+          {data.top_destinations.map((d) => (
+            <li key={d.ip} className="flex items-center justify-between gap-3 rounded-lg border border-border/50 bg-accent/20 p-3">
+              <div className="min-w-0">
+                <Ltr className="text-sm text-foreground">{d.ip}</Ltr>
+                <p className="truncate text-xs text-muted-foreground">{[d.city, d.country].filter(Boolean).join(", ") || t("common.unknown")}</p>
+              </div>
+              <div className="shrink-0 text-end">
+                <p className="text-sm text-foreground">{fmt.bytes(d.bytes)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {fmt.number(d.connections)} {t("traffic.connections")}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+function ByCountry({ data }: { data: TrafficSummary }) {
+  const { t, fmt } = useI18n();
+  return (
+    <div className="space-y-6">
+      <ChartFigure
+        title={t("traffic.byCountry")}
+        columns={[t("traffic.country"), t("traffic.connections"), t("traffic.data")]}
+        rows={data.countries.map((c) => [c.country, c.connections, fmt.bytes(c.bytes)])}
+      >
+        <div dir="ltr">
+          <ResponsiveContainer width="100%" height={Math.max(160, data.countries.length * 44)}>
+            <BarChart data={data.countries} layout="vertical" margin={{ left: 8, right: 16 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis type="number" stroke={axisColor} fontSize={10} />
+              <YAxis dataKey="country" type="category" stroke={axisColor} fontSize={11} width={110} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="connections" name={t("traffic.connections")} fill="#3b82f6" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </ChartFigure>
+
+      <div className="overflow-x-auto rounded-xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <caption className="sr-only">{t("traffic.byCountry")}</caption>
+          <thead>
+            <tr className="border-b border-border text-xs text-muted-foreground">
+              <th scope="col" className="px-4 py-2 text-start">{t("traffic.country")}</th>
+              <th scope="col" className="px-4 py-2 text-start">{t("traffic.connections")}</th>
+              <th scope="col" className="px-4 py-2 text-start">{t("traffic.data")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.countries.map((c) => (
+              <tr key={c.country} className="border-b border-border/50">
+                <td className="px-4 py-2 text-foreground">{c.country}</td>
+                <td className="px-4 py-2 text-muted-foreground">{fmt.number(c.connections)}</td>
+                <td className="px-4 py-2 text-muted-foreground">{fmt.bytes(c.bytes)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function Suspicious({ data }: { data: TrafficSummary }) {
+  const { t, fmt } = useI18n();
+  return (
+    <section aria-labelledby="suspicious-title" className="rounded-xl border border-red-500/30 bg-red-500/5 p-5">
+      <h2 id="suspicious-title" className="mb-4 flex items-center gap-2 text-sm font-semibold text-red-400">
+        <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+        {t("traffic.suspiciousTitle")}
+      </h2>
+      {data.suspicious.length === 0 ? (
+        <p className="text-center text-sm text-muted-foreground">{t("traffic.noSuspicious")}</p>
+      ) : (
+        <ul className="space-y-3">
+          {data.suspicious.map((s) => (
+            <li key={`${s.destination_ip}:${s.destination_port}`} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
+              <div>
+                <Ltr className="text-sm font-medium text-foreground">{s.destination_ip}</Ltr>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {[s.city, s.country].filter(Boolean).join(", ") || t("common.unknown")} · {fmt.number(s.connections)} {t("traffic.connections")}
+                </p>
+              </div>
+              <div className="text-end">
+                <p className="text-sm font-medium text-red-300">{fmt.bytes(s.bytes)}</p>
+                {s.destination_port != null && <p className="text-xs text-muted-foreground">{t("traffic.port", { port: s.destination_port })}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
