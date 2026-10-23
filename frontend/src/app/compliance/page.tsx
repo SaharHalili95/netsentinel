@@ -10,6 +10,7 @@ import { fetchComplianceHistory, fetchComplianceStatus, fetchCriteria, fetchRequ
 import { cn } from "@/lib/utils";
 import { useAsync } from "@/lib/useAsync";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import ScrollRegion from "@/components/ui/ScrollRegion";
 
 const STATUS_STYLE = {
   pass: { icon: CheckCircle, color: "text-green-400" },
@@ -48,7 +49,7 @@ export default function CompliancePage() {
 
           <section aria-labelledby="checks" className="rounded-xl border border-border bg-card">
             <h2 id="checks" className="border-b border-border p-4 text-sm font-semibold text-foreground">{t("compliance.checks")}</h2>
-            <div className="overflow-x-auto">
+            <ScrollRegion label={t("compliance.checks")}>
               <table className="w-full min-w-[560px] text-sm">
                 <caption className="sr-only">{t("compliance.checks")}</caption>
                 <thead>
@@ -80,7 +81,7 @@ export default function CompliancePage() {
                   })}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </section>
 
           <ChartFigure

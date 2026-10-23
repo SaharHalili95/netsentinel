@@ -19,7 +19,7 @@ export default function ChartFigure({ title, description, columns, rows, childre
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </figcaption>
-      <div aria-hidden="true">{children}</div>
+      <div aria-hidden="true" inert>{children}</div>
       <table className="sr-only">
         <caption>{`${title}: ${t("common.chartData")}`}</caption>
         <thead>

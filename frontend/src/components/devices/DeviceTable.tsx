@@ -8,6 +8,7 @@ import Ltr from "@/components/ui/Ltr";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import { deviceIcons } from "./deviceIcons";
 import DeviceDetail from "./DeviceDetail";
+import ScrollRegion from "@/components/ui/ScrollRegion";
 
 interface DeviceTableProps {
   devices: Device[];
@@ -23,7 +24,7 @@ export default function DeviceTable({ devices, onTrust }: DeviceTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <ScrollRegion label={t("devices.tableCaption")}>
       <table className="w-full min-w-[640px] text-sm">
         <caption className="sr-only">{t("devices.tableCaption")}</caption>
         <thead>
@@ -95,6 +96,6 @@ export default function DeviceTable({ devices, onTrust }: DeviceTableProps) {
           })}
         </tbody>
       </table>
-    </div>
+    </ScrollRegion>
   );
 }

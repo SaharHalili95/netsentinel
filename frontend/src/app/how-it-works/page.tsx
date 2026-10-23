@@ -3,6 +3,7 @@
 import { Info } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { useI18n } from "@/lib/i18n/I18nProvider";
+import ScrollRegion from "@/components/ui/ScrollRegion";
 
 const STEPS = ["discovery", "ports", "capture", "anomaly", "alerts", "ui"];
 
@@ -48,7 +49,7 @@ export default function HowItWorksPage() {
 
       <section aria-labelledby="stack" className="rounded-xl border border-border bg-card">
         <h2 id="stack" className="border-b border-border p-4 text-sm font-semibold text-foreground">{t("howItWorks.stack")}</h2>
-        <div className="overflow-x-auto">
+        <ScrollRegion label={t("howItWorks.stack")}>
           <table className="w-full text-sm">
             <caption className="sr-only">{t("howItWorks.stack")}</caption>
             <thead>
@@ -68,7 +69,7 @@ export default function HowItWorksPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       </section>
 
       <section aria-labelledby="demo-note" className="flex gap-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-5">

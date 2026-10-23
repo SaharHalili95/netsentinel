@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useAsync } from "@/lib/useAsync";
 import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { TrafficSummary } from "@/types";
+import ScrollRegion from "@/components/ui/ScrollRegion";
 
 const TABS = [
   { key: "overview", icon: Activity },
@@ -163,7 +164,7 @@ function ByCountry({ data }: { data: TrafficSummary }) {
         </div>
       </ChartFigure>
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-card">
+      <ScrollRegion label={t("traffic.byCountry")} className="rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <caption className="sr-only">{t("traffic.byCountry")}</caption>
           <thead>
@@ -183,7 +184,7 @@ function ByCountry({ data }: { data: TrafficSummary }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </div>
   );
 }

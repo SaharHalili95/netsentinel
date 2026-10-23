@@ -19,7 +19,7 @@ export default function AlertsFeed({ alerts }: { alerts: DashboardData["recent_a
   }
 
   return (
-    <ul className="max-h-[340px] space-y-2 overflow-y-auto pe-1">
+    <ul tabIndex={0} aria-label={t("dashboard.recentAlerts")} className="max-h-[340px] space-y-2 overflow-y-auto pe-1">
       {alerts.map((alert) => {
         const Icon = severityIcons[alert.severity] ?? Info;
         return (

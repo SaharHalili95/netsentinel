@@ -26,7 +26,7 @@ export default function NetworkMap({ devices }: { devices: Device[] }) {
         ))}
       </ul>
 
-      <div aria-hidden="true" dir="ltr" className="relative flex h-[260px] items-center justify-center overflow-hidden">
+      <div aria-hidden="true" inert dir="ltr" className="relative flex h-[260px] items-center justify-center overflow-hidden">
         <svg className="absolute inset-0 h-full w-full" viewBox="-130 -130 260 260" preserveAspectRatio="xMidYMid meet">
           {others.map((d, i) => {
             const angle = (i * 2 * Math.PI) / others.length - Math.PI / 2;

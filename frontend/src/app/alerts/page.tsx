@@ -92,7 +92,7 @@ export default function AlertsPage() {
                 return (
                   <li
                     key={alert.id}
-                    className={cn("rounded-xl border p-4", severityColor(alert.severity), alert.status === "resolved" && "opacity-70")}
+                    className={cn("rounded-xl border p-4", severityColor(alert.severity), alert.status === "resolved" && "border-border bg-card text-muted-foreground")}
                   >
                     <div className="flex items-start gap-3">
                       <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
