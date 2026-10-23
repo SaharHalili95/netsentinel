@@ -1,4 +1,8 @@
 import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach } from "vitest";
+
+afterEach(() => cleanup());
 
 // Node 25 ships its own localStorage global without a backing file, which shadows jsdom's.
 if (typeof globalThis.localStorage?.clear !== "function") {
