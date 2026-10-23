@@ -203,7 +203,7 @@ export const he: Messages = {
     reduceMotionHint: "עוצר אנימציות כמו אייקונים מסתובבים ונקודות מהבהבות",
     savedLocally: "נשמר בדפדפן הזה",
     scanning: "סריקה",
-    serverNote: "הערכים האלה מוגדרים בשרת במשתני סביבה, ולכן כאן הם לקריאה בלבד.",
+    serverNote: "הערכים האלה מוגדרים בשרת (בהגדרות ובמתזמן של ה-backend), ולכן כאן הם לקריאה בלבד.",
     network: "רשת יעד",
     discoveryInterval: "גילוי מכשירים",
     portScanInterval: "סריקת פורטים",

@@ -201,7 +201,7 @@ export const en = {
     reduceMotionHint: "Stops animations such as spinning icons and pulsing dots",
     savedLocally: "Saved in this browser",
     scanning: "Scanning",
-    serverNote: "These values are set on the server with environment variables, so they are read-only here.",
+    serverNote: "These values are set on the server (backend config and scheduler), so they are read-only here.",
     network: "Target network",
     discoveryInterval: "Device discovery",
     portScanInterval: "Port scan",
