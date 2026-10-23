@@ -18,7 +18,9 @@ export function formatBytes(bytes: number, locale: Locale): string {
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
-  return `${formatNumber(bytes / Math.pow(k, i), locale)} ${sizes[i]}`;
+  const text = `${formatNumber(bytes / Math.pow(k, i), locale)} ${sizes[i]}`;
+  // Isolate as left-to-right so Hebrew text doesn't flip it to "MB 252.6".
+  return locale === "he" ? `\u2066${text}\u2069` : text;
 }
 
 export function formatDate(date: string, locale: Locale): string {

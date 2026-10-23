@@ -32,10 +32,10 @@ function Shell({ children }: { children: React.ReactNode }) {
       >
         {t("app.skipToContent")}
       </a>
-      {isDemo && <DemoBanner />}
       <div className="flex min-h-screen">
         <Sidebar open={menuOpen} onClose={closeMenu} />
         <div className="min-w-0 flex-1 lg:ps-64">
+          {isDemo && <DemoBanner />}
           <Header menuOpen={menuOpen} onToggleMenu={() => setMenuOpen((o) => !o)} toggleRef={toggleRef} />
           <main id="main" tabIndex={-1} className="p-4 outline-none sm:p-6">
             {children}

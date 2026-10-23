@@ -53,3 +53,11 @@ test("a device row expands to show its open ports", async ({ page }) => {
 
   await expect(page.getByText("3389/tcp")).toBeVisible();
 });
+
+test("on desktop the navigation is always visible", async ({ page, isMobile }) => {
+  test.skip(isMobile, "phones use the menu button");
+  await openPage(page, "/");
+
+  await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Devices" })).toBeInViewport();
+});

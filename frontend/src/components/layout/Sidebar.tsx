@@ -54,8 +54,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <aside
         id="sidebar"
         className={cn(
-          "fixed inset-y-0 start-0 z-50 flex w-64 flex-col border-e border-border bg-card transition-transform motion-reduce:transition-none lg:visible lg:translate-x-0",
-          open ? "visible translate-x-0" : "invisible ltr:-translate-x-full rtl:translate-x-full"
+          "fixed inset-y-0 start-0 z-50 flex w-64 flex-col border-e border-border bg-card transition-transform motion-reduce:transition-none",
+          !open && "max-lg:invisible max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full"
         )}
       >
         <div className="flex h-16 items-center gap-3 border-b border-border px-6">

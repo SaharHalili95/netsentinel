@@ -77,9 +77,9 @@ describe("formatters", () => {
     expect(timeAgo(fiveMinutesAgo, "he")).toBe("לפני 5 דקות");
   });
 
-  it("formatBytes uses the locale's digits grouping", () => {
+  it("formatBytes keeps the unit after the number, isolated as LTR in Hebrew", () => {
     expect(formatBytes(0, "en")).toBe("0 B");
     expect(formatBytes(1536, "en")).toBe("1.5 KB");
-    expect(formatBytes(1_258_000_000, "he")).toBe("1.2 GB");
+    expect(formatBytes(1_258_000_000, "he")).toBe("\u20661.2 GB\u2069");
   });
 });
