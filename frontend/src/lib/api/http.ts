@@ -44,6 +44,9 @@ export const deleteDevice = (id: string) =>
 export const fetchScans = (params?: { scan_type?: string; limit?: number }) =>
   api.get<Scan[]>("/api/scans", { params }).then((r) => r.data);
 
+export const fetchScan = (id: string) =>
+  api.get<Scan>(`/api/scans/${id}`).then((r) => r.data);
+
 export const createScan = (data: { scan_type: string; target_network?: string }) =>
   api.post<Scan>("/api/scans", data).then((r) => r.data);
 

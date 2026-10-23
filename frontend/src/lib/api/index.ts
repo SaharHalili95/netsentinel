@@ -12,6 +12,7 @@ export const {
   updateDevice,
   deleteDevice,
   fetchScans,
+  fetchScan,
   createScan,
   fetchAlerts,
   fetchAlertCounts,

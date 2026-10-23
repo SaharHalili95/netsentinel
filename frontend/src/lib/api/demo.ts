@@ -105,6 +105,9 @@ export const fetchScans = (params?: { scan_type?: string; limit?: number }) =>
       .slice(0, params?.limit ?? 50)
   );
 
+export const fetchScan = (id: string) =>
+  copy(store.scans.find((s) => s.id === id) ?? notFound("Scan", id));
+
 export async function createScan(data: { scan_type: string; target_network?: string }): Promise<Scan> {
   const online = store.devices.filter((d) => d.is_online);
   const ports = data.scan_type === "discovery" ? 0 : online.reduce((n, d) => n + Object.keys(d.open_ports ?? {}).length, 0);

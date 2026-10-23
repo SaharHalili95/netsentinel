@@ -5,7 +5,8 @@ import { Play, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import ErrorState from "@/components/ui/ErrorState";
 import Ltr from "@/components/ui/Ltr";
-import { fetchScans, createScan } from "@/lib/api";
+import { fetchScans, fetchScan, createScan } from "@/lib/api";
+import { waitForScan } from "@/lib/waitForScan";
 import { cn, statusColor } from "@/lib/utils";
 import { useAsync } from "@/lib/useAsync";
 import { useI18n } from "@/lib/i18n/I18nProvider";
@@ -35,12 +36,16 @@ export default function ScansPage() {
     setActionError(false);
     setAnnouncement(t("scans.running"));
     try {
-      const scan = await createScan({ scan_type: type });
+      const created = await createScan({ scan_type: type });
       await reload();
+      const scan = await waitForScan(created.id, fetchScan);
+      if (scan !== created) await reload();
       if (scan.status === "completed") {
         setAnnouncement(
           t("scans.started", { name: t(`enum.scanType.${type}`), devices: scan.devices_found, ports: scan.open_ports_found })
         );
+      } else {
+        setAnnouncement(`${t(`enum.scanType.${type}`)}: ${t(`enum.scanStatus.${scan.status}`)}`);
       }
     } catch {
       setActionError(true);
