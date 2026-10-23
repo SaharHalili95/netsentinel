@@ -29,7 +29,7 @@ The live demo is the real Next.js app, exported as static files, with a sample h
   | New device | Medium | A MAC address not seen before |
   | Risky open port | High | 23, 135, 139, 445, 3389 or 5900 open on a device |
 
-- **Alerts:** open, then acknowledged, then resolved. New alerts are pushed over WebSocket and announced to screen readers.
+- **Alerts:** open, then acknowledged, then resolved. Alerts from the traffic rules and finished scheduled scans are pushed over WebSocket, and new alerts are announced to screen readers.
 - **SOC 2 daily checks:** six required checks mapped to CC6.1, CC7.1, CC7.2, CC7.3, A1.1 and A1.2, a daily score and 30 days of history.
 
 ## Built for everyone
@@ -41,15 +41,15 @@ The live demo is the real Next.js app, exported as static files, with a sample h
   - every chart has a caption and a screen-reader table of the same numbers
   - axe finds no WCAG 2.1 A/AA violations on any page, in either language, checked in CI
   - honors `prefers-reduced-motion`, with an extra switch in Settings
-- **Mobile:** the sidebar becomes a drawer, wide tables scroll inside their card, and CI checks every page for horizontal overflow on iPhone and Android.
+- **Mobile:** the sidebar becomes a drawer, wide tables scroll inside their card, and CI checks every page for horizontal overflow on iPhone 14 and Pixel 7.
 - **Honest about failures:** if the API is down, pages show an error with a retry button. If an action fails, the screen does not pretend it worked.
 
 ## Tests
 
 | Suite | What it covers | Count |
 | --- | --- | --- |
-| pytest | anomaly rules, discovery XML parsing, port scanner, GeoIP, alerting, SOC 2 scoring, traffic summary, API key security | 76 |
-| Vitest | demo API behavior, translations (key parity, RTL, persistence), formatters, the app shell (menu, skip link, alert badge), request races | 23 |
+| pytest | anomaly rules, discovery XML parsing, port scanner, GeoIP, alerting, SOC 2 scoring, traffic summary, WebSocket pushes, API key security | 78 |
+| Vitest | demo API behavior, translations (key parity, RTL, persistence), formatters, the app shell (menu, skip link, alert badge), request races, scan polling | 27 |
 | Playwright | every page in both languages, axe accessibility, RTL, keyboard, trust/acknowledge/resolve/scan flows, on iPhone 14, Pixel 7 and desktop Chrome | 123 runs |
 
 CI runs all three on every push, plus `pip-audit` and `npm audit`.
@@ -109,7 +109,7 @@ cd frontend && npm test && npx playwright test
 | POST | `/api/alerts/resolve-all` | Resolve every open alert |
 | GET | `/api/traffic/summary` | Protocols, destinations, countries, suspicious connections, hourly volume |
 | GET | `/api/compliance/status`, `/history`, `/checks/required`, `/criteria` | SOC 2 daily checks |
-| WS | `/api/ws/live` | Live alerts, scan and device updates |
+| WS | `/api/ws/live` | New alerts from the traffic rules and finished scheduled scans |
 
 ## License
 
