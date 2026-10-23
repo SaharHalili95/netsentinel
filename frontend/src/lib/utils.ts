@@ -42,10 +42,10 @@ export function timeAgo(date: string, locale: Locale): string {
 
 export function severityColor(severity: string): string {
   const colors: Record<string, string> = {
-    critical: "text-red-500 bg-red-500/10 border-red-500/20",
-    high: "text-orange-500 bg-orange-500/10 border-orange-500/20",
-    medium: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20",
-    low: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+    critical: "text-red-400 bg-red-500/10 border-red-500/30",
+    high: "text-orange-400 bg-orange-500/10 border-orange-500/30",
+    medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
+    low: "text-blue-400 bg-blue-500/10 border-blue-500/30",
     info: "text-slate-400 bg-slate-500/10 border-slate-500/20",
   };
   return colors[severity] || colors.info;
