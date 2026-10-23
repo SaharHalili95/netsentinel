@@ -62,7 +62,7 @@ export default function Header({ menuOpen, onToggleMenu, toggleRef }: HeaderProp
 
         <Link
           href="/alerts"
-          aria-label={t("app.openAlertsBell", { n: openAlerts ?? 0 })}
+          aria-label={openAlerts === null ? t("nav.alerts") : t("app.openAlertsBell", { n: openAlerts })}
           className="relative rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
         >
           <Bell className="h-5 w-5" aria-hidden="true" />
