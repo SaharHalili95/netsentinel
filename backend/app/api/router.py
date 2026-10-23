@@ -7,6 +7,7 @@ from app.api.alerts import router as alerts_router
 from app.api.websocket import router as ws_router
 from app.api.demo import router as demo_router
 from app.api.compliance import router as compliance_router
+from app.api.traffic import router as traffic_router
 
 api_router = APIRouter()
 
@@ -17,3 +18,4 @@ api_router.include_router(alerts_router, prefix="/alerts", tags=["Alerts"])
 api_router.include_router(ws_router, prefix="/ws", tags=["WebSocket"])
 api_router.include_router(demo_router, prefix="/demo", tags=["Demo"])
 api_router.include_router(compliance_router, prefix="/compliance", tags=["SOC2 Compliance"])
+api_router.include_router(traffic_router, prefix="/traffic", tags=["Traffic"])

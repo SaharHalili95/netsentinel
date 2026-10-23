@@ -1,31 +1,20 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
+import AppShell from "@/components/layout/AppShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NetSentinel - Network Security Monitor",
-  description: "Real-time network monitoring and intrusion detection platform",
+  title: "NetSentinel - Home Network Security Monitor",
+  description: "Device discovery, port scanning, traffic analysis and alerts for a home network",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
       <body className={inter.className}>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <div className="flex-1 pl-64">
-            <Header />
-            <main className="p-6">{children}</main>
-          </div>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

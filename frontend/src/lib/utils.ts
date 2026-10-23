@@ -5,16 +5,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+export type Locale = "en" | "he";
+
+const INTL_LOCALE: Record<Locale, string> = { en: "en-IL", he: "he-IL" };
+
+export function formatNumber(n: number, locale: Locale): string {
+  return new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 1 }).format(n);
 }
 
-export function formatDate(date: string): string {
-  return new Date(date).toLocaleString("en-IL", {
+export function formatBytes(bytes: number, locale: Locale): string {
+  if (bytes <= 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+  const text = `${formatNumber(bytes / Math.pow(k, i), locale)} ${sizes[i]}`;
+  // Isolate as left-to-right so Hebrew text doesn't flip it to "MB 252.6".
+  return locale === "he" ? `\u2066${text}\u2069` : text;
+}
+
+export function formatDate(date: string, locale: Locale): string {
+  return new Date(date).toLocaleString(INTL_LOCALE[locale], {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -22,20 +32,22 @@ export function formatDate(date: string): string {
   });
 }
 
-export function timeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
+export function timeAgo(date: string, locale: Locale): string {
+  const seconds = Math.round((new Date(date).getTime() - Date.now()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(INTL_LOCALE[locale], { numeric: "auto" });
+  const abs = Math.abs(seconds);
+  if (abs < 60) return rtf.format(0, "second");
+  if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+  if (abs < 86400) return rtf.format(Math.round(seconds / 3600), "hour");
+  return rtf.format(Math.round(seconds / 86400), "day");
 }
 
 export function severityColor(severity: string): string {
   const colors: Record<string, string> = {
-    critical: "text-red-500 bg-red-500/10 border-red-500/20",
-    high: "text-orange-500 bg-orange-500/10 border-orange-500/20",
-    medium: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20",
-    low: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+    critical: "text-red-400 bg-red-500/10 border-red-500/30",
+    high: "text-orange-400 bg-orange-500/10 border-orange-500/30",
+    medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
+    low: "text-blue-400 bg-blue-500/10 border-blue-500/30",
     info: "text-slate-400 bg-slate-500/10 border-slate-500/20",
   };
   return colors[severity] || colors.info;

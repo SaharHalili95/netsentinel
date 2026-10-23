@@ -35,3 +35,7 @@ backend/data/
 # Docker
 docker-compose.override.yml
 *.tsbuildinfo
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/

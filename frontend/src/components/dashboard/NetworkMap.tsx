@@ -1,99 +1,75 @@
 "use client";
 
-import { Monitor, Router, Smartphone, Tv, HelpCircle, Server } from "lucide-react";
+import { HelpCircle, Router } from "lucide-react";
+import type { Device } from "@/types";
+import { deviceIcons } from "@/components/devices/deviceIcons";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 
-interface NetworkDevice {
-  ip: string;
-  hostname: string;
-  type: string;
-  isOnline: boolean;
-}
+const RADIUS = 100;
 
-const typeIcons: Record<string, typeof Monitor> = {
-  router: Router,
-  desktop: Monitor,
-  mobile: Smartphone,
-  tv: Tv,
-  server: Server,
-  unknown: HelpCircle,
-};
+export default function NetworkMap({ devices }: { devices: Device[] }) {
+  const { t } = useI18n();
+  const gateway = devices.find((d) => d.device_type === "router");
+  const others = devices.filter((d) => d !== gateway);
+  const label = (d: Device) => d.hostname ?? d.ip_address;
+  const status = (d: Device) => (d.is_online ? t("devices.onlineStatus") : t("devices.offlineStatus"));
 
-// Mock devices for visualization
-const mockDevices: NetworkDevice[] = [
-  { ip: "192.168.1.1", hostname: "Router", type: "router", isOnline: true },
-  { ip: "192.168.1.100", hostname: "Desktop PC", type: "desktop", isOnline: true },
-  { ip: "192.168.1.101", hostname: "iPhone", type: "mobile", isOnline: true },
-  { ip: "192.168.1.102", hostname: "Smart TV", type: "tv", isOnline: true },
-  { ip: "192.168.1.150", hostname: "Unknown", type: "unknown", isOnline: true },
-  { ip: "192.168.1.103", hostname: "Server", type: "server", isOnline: false },
-];
-
-export default function NetworkMap() {
   return (
-    <div className="relative flex h-[260px] items-center justify-center">
-      {/* Center - Router */}
-      <div className="absolute flex flex-col items-center gap-1">
-        <div className="rounded-full bg-primary/20 p-4 ring-2 ring-primary/40">
-          <Router className="h-8 w-8 text-primary" />
-        </div>
-        <span className="text-[10px] text-muted-foreground">Gateway</span>
-      </div>
+    <section aria-labelledby="network-map" className="rounded-xl border border-border bg-card p-5">
+      <h2 id="network-map" className="text-sm font-semibold text-foreground">{t("dashboard.topology")}</h2>
+      <p className="mb-4 text-xs text-muted-foreground">{t("dashboard.topologyDesc")}</p>
 
-      {/* Surrounding devices */}
-      {mockDevices.slice(1).map((device, index) => {
-        const angle = (index * 360) / (mockDevices.length - 1);
-        const radius = 100;
-        const x = Math.cos((angle * Math.PI) / 180) * radius;
-        const y = Math.sin((angle * Math.PI) / 180) * radius;
-        const Icon = typeIcons[device.type] || HelpCircle;
+      <ul className="sr-only">
+        {gateway && <li>{`${t("dashboard.gateway")}: ${label(gateway)} (${gateway.ip_address})`}</li>}
+        {others.map((d) => (
+          <li key={d.id}>{`${label(d)} (${d.ip_address}), ${t(`enum.deviceType.${d.device_type}`)}, ${status(d)}`}</li>
+        ))}
+      </ul>
 
-        return (
-          <div
-            key={device.ip}
-            className="absolute flex flex-col items-center gap-1"
-            style={{
-              transform: `translate(${x}px, ${y}px)`,
-            }}
-          >
-            {/* Connection line */}
-            <svg
-              className="absolute inset-0 -z-10"
-              style={{
-                width: "1px",
-                height: "1px",
-                overflow: "visible",
-              }}
-            >
+      <div aria-hidden="true" inert dir="ltr" className="relative flex h-[260px] items-center justify-center overflow-hidden">
+        <svg className="absolute inset-0 h-full w-full" viewBox="-130 -130 260 260" preserveAspectRatio="xMidYMid meet">
+          {others.map((d, i) => {
+            const angle = (i * 2 * Math.PI) / others.length - Math.PI / 2;
+            return (
               <line
+                key={d.id}
                 x1="0"
                 y1="0"
-                x2={-x}
-                y2={-y}
-                stroke={device.isOnline ? "hsl(210, 100%, 52%)" : "hsl(216, 34%, 17%)"}
+                x2={Math.cos(angle) * RADIUS}
+                y2={Math.sin(angle) * RADIUS}
+                stroke={d.is_online ? "hsl(210, 100%, 60%)" : "hsl(215, 20%, 40%)"}
                 strokeWidth="1"
-                strokeDasharray={device.isOnline ? "none" : "4 4"}
-                opacity="0.3"
+                strokeDasharray={d.is_online ? undefined : "4 4"}
+                opacity="0.5"
               />
-            </svg>
-            <div
-              className={`rounded-full p-2.5 ${
-                device.isOnline
-                  ? "bg-accent ring-1 ring-border"
-                  : "bg-muted/50 ring-1 ring-border/50 opacity-40"
-              }`}
-            >
-              <Icon
-                className={`h-4 w-4 ${
-                  device.isOnline ? "text-foreground" : "text-muted-foreground"
-                }`}
-              />
-            </div>
-            <span className="text-[9px] text-muted-foreground whitespace-nowrap">
-              {device.hostname}
-            </span>
+            );
+          })}
+        </svg>
+
+        <div className="absolute flex flex-col items-center gap-1">
+          <div className="rounded-full bg-primary/20 p-4 ring-2 ring-primary/40">
+            <Router className="h-8 w-8 text-primary" />
           </div>
-        );
-      })}
-    </div>
+          <span className="text-[11px] text-muted-foreground">{gateway ? label(gateway) : t("dashboard.gateway")}</span>
+        </div>
+
+        {others.map((d, i) => {
+          const angle = (i * 2 * Math.PI) / others.length - Math.PI / 2;
+          const Icon = deviceIcons[d.device_type] ?? HelpCircle;
+          return (
+            <div
+              key={d.id}
+              className="absolute flex flex-col items-center gap-1"
+              style={{ transform: `translate(${Math.cos(angle) * RADIUS}px, ${Math.sin(angle) * RADIUS}px)` }}
+            >
+              <div className={`rounded-full p-2.5 ring-1 ${d.is_online ? "bg-accent ring-border" : "bg-muted/50 opacity-50 ring-border/50"}`}>
+                <Icon className={`h-4 w-4 ${d.is_online ? "text-foreground" : "text-muted-foreground"}`} />
+              </div>
+              <span className="max-w-20 truncate text-[10px] text-muted-foreground">{label(d)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
