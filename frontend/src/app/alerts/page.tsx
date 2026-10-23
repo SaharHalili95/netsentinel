@@ -1,180 +1,148 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle, Eye, XCircle, Info, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle, Eye, Info, ShieldCheck } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
+import ErrorState from "@/components/ui/ErrorState";
+import FilterButtons from "@/components/ui/FilterButtons";
+import Ltr from "@/components/ui/Ltr";
+import { severityIcons } from "@/components/alerts/severityIcons";
 import { fetchAlerts, updateAlert, resolveAllAlerts } from "@/lib/api";
-import { cn, severityColor, statusColor, formatDate, timeAgo } from "@/lib/utils";
+import { cn, severityColor, statusColor } from "@/lib/utils";
+import { useAsync } from "@/lib/useAsync";
+import { useI18n } from "@/lib/i18n/I18nProvider";
 import type { Alert } from "@/types";
 
-const mockAlerts: Alert[] = [
-  { id: "1", device_id: null, alert_type: "suspicious_port", severity: "critical", title: "Suspicious port 4444 connection from 192.168.1.150", description: "Device 192.168.1.150 connected to suspicious port 4444 on 185.220.101.1. This port is commonly used by Meterpreter.", status: "open", source_ip: "192.168.1.150", resolved_at: null, created_at: new Date(Date.now() - 120000).toISOString() },
-  { id: "2", device_id: null, alert_type: "new_device", severity: "high", title: "New unknown device discovered: 192.168.1.150", description: "A new device was found on the network. IP: 192.168.1.150, MAC: AA:BB:CC:DD:EE:05, Hostname: N/A", status: "open", source_ip: "192.168.1.150", resolved_at: null, created_at: new Date(Date.now() - 300000).toISOString() },
-  { id: "3", device_id: null, alert_type: "watchlist_country", severity: "medium", title: "Connection to watchlist country: Germany", description: "Device 192.168.1.150 communicated with 185.220.101.1 in Germany (Berlin)", status: "open", source_ip: "192.168.1.150", resolved_at: null, created_at: new Date(Date.now() - 600000).toISOString() },
-  { id: "4", device_id: null, alert_type: "open_port", severity: "medium", title: "Port 3389 (RDP) open on 192.168.1.100", description: "Potentially risky port 3389 (Remote Desktop) detected open on device desktop-pc", status: "acknowledged", source_ip: "192.168.1.100", resolved_at: null, created_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: "5", device_id: null, alert_type: "open_port", severity: "low", title: "Port 22 (SSH) open on 192.168.1.100", description: "SSH service detected on desktop-pc. Ensure strong authentication is configured.", status: "resolved", source_ip: "192.168.1.100", resolved_at: new Date(Date.now() - 1800000).toISOString(), created_at: new Date(Date.now() - 7200000).toISOString() },
-];
-
-const severityIcons: Record<string, typeof AlertTriangle> = {
-  critical: XCircle,
-  high: AlertTriangle,
-  medium: AlertTriangle,
-  low: Info,
-  info: Info,
-};
+type Filter = "all" | "active" | Alert["severity"];
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>("all");
+  const { t, fmt } = useI18n();
+  const { data: alerts, error, loading, reload, setData } = useAsync(() => fetchAlerts({ limit: 50 }));
+  const [filter, setFilter] = useState<Filter>("all");
+  const [actionError, setActionError] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
 
-  const loadAlerts = async () => {
+  const handleStatusChange = async (alert: Alert, status: Alert["status"]) => {
+    setActionError(false);
     try {
-      const data = await fetchAlerts({ limit: 50 });
-      setAlerts(data);
+      const updated = await updateAlert(alert.id, { status });
+      setData((prev) => prev?.map((a) => (a.id === alert.id ? { ...a, status: updated.status } : a)) ?? prev);
+      setAnnouncement(`${alert.title}: ${t(`enum.alertStatus.${updated.status}`)}`);
     } catch {
-      setAlerts(mockAlerts);
-    } finally {
-      setLoading(false);
+      setActionError(true);
     }
-  };
-
-  useEffect(() => {
-    loadAlerts();
-  }, []);
-
-  const handleStatusChange = async (id: string, status: string) => {
-    try {
-      await updateAlert(id, { status });
-    } catch {
-      // fallback
-    }
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: status as Alert["status"] } : a))
-    );
   };
 
   const handleResolveAll = async () => {
+    setActionError(false);
     try {
       await resolveAllAlerts();
+      setData((prev) => prev?.map((a) => ({ ...a, status: "resolved" as const })) ?? prev);
+      setAnnouncement(t("alerts.resolvedAll"));
     } catch {
-      // fallback
+      setActionError(true);
     }
-    setAlerts((prev) => prev.map((a) => ({ ...a, status: "resolved" as const })));
   };
 
-  const filteredAlerts = alerts.filter((a) => {
-    if (filter === "all") return true;
-    if (filter === "active") return a.status !== "resolved";
-    return a.severity === filter;
-  });
-
-  const openCount = alerts.filter((a) => a.status === "open").length;
+  const list = alerts ?? [];
+  const shown = list.filter((a) => (filter === "all" ? true : filter === "active" ? a.status !== "resolved" : a.severity === filter));
+  const openCount = list.filter((a) => a.status === "open").length;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Alerts</h1>
-          <p className="text-sm text-muted-foreground">
-            {openCount} open alerts requiring attention
-          </p>
-        </div>
+      <PageHeader title={t("alerts.title")} subtitle={t("alerts.openCount", { n: openCount })} onRefresh={reload} loading={loading}>
         {openCount > 0 && (
           <button
+            type="button"
             onClick={handleResolveAll}
-            className="flex items-center gap-2 rounded-lg bg-green-500/10 px-4 py-2 text-sm font-medium text-green-500 hover:bg-green-500/20 transition-colors"
+            className="flex items-center gap-2 rounded-lg bg-green-500/10 px-4 py-2 text-sm font-medium text-green-400 transition-colors hover:bg-green-500/20"
           >
-            <ShieldCheck className="h-4 w-4" />
-            Resolve All
+            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+            {t("alerts.resolveAll")}
           </button>
         )}
-      </div>
+      </PageHeader>
 
-      {/* Filters */}
-      <div className="flex gap-2 flex-wrap">
-        {["all", "active", "critical", "high", "medium", "low"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={cn(
-              "rounded-lg px-4 py-2 text-sm font-medium transition-colors capitalize",
-              filter === f
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-accent"
-            )}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      <p role="status" className="sr-only">{announcement}</p>
+      {error ? <ErrorState onRetry={reload} /> : null}
+      {actionError && <ErrorState message={t("common.actionError")} />}
 
-      {/* Alert List */}
-      <div className="space-y-3">
-        {filteredAlerts.map((alert) => {
-          const Icon = severityIcons[alert.severity] || Info;
-          return (
-            <div
-              key={alert.id}
-              className={cn(
-                "rounded-xl border p-4 transition-colors",
-                severityColor(alert.severity),
-                alert.status === "resolved" && "opacity-50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <Icon className="mt-0.5 h-5 w-5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-medium text-foreground">{alert.title}</h3>
-                    <span className={cn("rounded px-1.5 py-0.5 text-[10px] font-medium uppercase", severityColor(alert.severity))}>
-                      {alert.severity}
-                    </span>
-                    <span className={cn("text-xs", statusColor(alert.status))}>
-                      {alert.status}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {alert.description}
-                  </p>
-                  <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>{timeAgo(alert.created_at)}</span>
-                    {alert.source_ip && <span>Source: {alert.source_ip}</span>}
-                    <span className="capitalize">{alert.alert_type.replace("_", " ")}</span>
-                  </div>
-                </div>
-                {alert.status !== "resolved" && (
-                  <div className="flex gap-1 flex-shrink-0">
-                    {alert.status === "open" && (
-                      <button
-                        onClick={() => handleStatusChange(alert.id, "acknowledged")}
-                        className="rounded-lg p-2 text-yellow-500 hover:bg-yellow-500/10 transition-colors"
-                        title="Acknowledge"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleStatusChange(alert.id, "resolved")}
-                      className="rounded-lg p-2 text-green-500 hover:bg-green-500/10 transition-colors"
-                      title="Resolve"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
+      {alerts && (
+        <>
+          <FilterButtons
+            label={t("alerts.filters")}
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "all", label: t("alerts.filterAll") },
+              { value: "active", label: t("alerts.filterActive") },
+              ...(["critical", "high", "medium", "low"] as const).map((s) => ({ value: s, label: t(`enum.severity.${s}`) })),
+            ]}
+          />
+
+          {shown.length === 0 ? (
+            <div className="flex h-32 flex-col items-center justify-center gap-2 rounded-xl border border-border text-muted-foreground">
+              <CheckCircle className="h-8 w-8 text-green-400" aria-hidden="true" />
+              {t("alerts.empty")}
             </div>
-          );
-        })}
-        {filteredAlerts.length === 0 && (
-          <div className="flex h-32 items-center justify-center rounded-xl border border-border text-muted-foreground">
-            <div className="flex flex-col items-center gap-2">
-              <CheckCircle className="h-8 w-8 text-green-500" />
-              No alerts matching this filter
-            </div>
-          </div>
-        )}
-      </div>
+          ) : (
+            <ul className="space-y-3">
+              {shown.map((alert) => {
+                const Icon = severityIcons[alert.severity] ?? Info;
+                return (
+                  <li
+                    key={alert.id}
+                    className={cn("rounded-xl border p-4", severityColor(alert.severity), alert.status === "resolved" && "opacity-70")}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="font-medium text-foreground" dir="auto">{alert.title}</h2>
+                          <span className="rounded border border-current px-1.5 py-0.5 text-[10px] font-semibold uppercase">
+                            {t(`enum.severity.${alert.severity}`)}
+                          </span>
+                          <span className={cn("text-xs", statusColor(alert.status))}>{t(`enum.alertStatus.${alert.status}`)}</span>
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground" dir="auto">{alert.description}</p>
+                        <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span>{fmt.ago(alert.created_at)}</span>
+                          {alert.source_ip && <span>{t("alerts.source", { ip: "" })}<Ltr>{alert.source_ip}</Ltr></span>}
+                          <span>{t(`enum.alertType.${alert.alert_type}`)}</span>
+                        </p>
+                      </div>
+                      {alert.status !== "resolved" && (
+                        <div className="flex shrink-0 gap-1">
+                          {alert.status === "open" && (
+                            <button
+                              type="button"
+                              onClick={() => handleStatusChange(alert, "acknowledged")}
+                              aria-label={t("alerts.acknowledge", { title: alert.title })}
+                              title={t("enum.alertStatus.acknowledged")}
+                              className="rounded-lg p-2 text-yellow-400 transition-colors hover:bg-yellow-500/10"
+                            >
+                              <Eye className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(alert, "resolved")}
+                            aria-label={t("alerts.resolve", { title: alert.title })}
+                            title={t("enum.alertStatus.resolved")}
+                            className="rounded-lg p-2 text-green-400 transition-colors hover:bg-green-500/10"
+                          >
+                            <CheckCircle className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </>
+      )}
     </div>
   );
 }
