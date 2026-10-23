@@ -23,15 +23,16 @@ export function seedDevices(): Device[] {
   ];
 }
 
+// Titles, severities and wording follow backend/app/services/anomaly_detector.py and scanner.py.
 export function seedAlerts(): Alert[] {
   const base = { resolved_at: null };
   return [
-    { ...base, id: "a1", device_id: "d6", alert_type: "suspicious_port", severity: "critical", title: "Suspicious port 4444 connection from 192.168.1.150", description: "192.168.1.150 connected to 185.220.101.4 on port 4444, which is commonly used by Metasploit reverse shells.", status: "open", source_ip: "192.168.1.150", created_at: ago(6 * MIN) },
-    { ...base, id: "a2", device_id: "d6", alert_type: "new_device", severity: "high", title: "New unknown device: 192.168.1.150", description: "A device with MAC 3E:91:0A:7B:66:06 joined the network. It has no hostname and a randomized MAC address.", status: "open", source_ip: "192.168.1.150", created_at: ago(40 * MIN) },
-    { ...base, id: "a3", device_id: "d6", alert_type: "watchlist_country", severity: "medium", title: "Connection to a watchlist country: Russia", description: "192.168.1.150 exchanged traffic with 95.213.4.18 (Saint Petersburg).", status: "open", source_ip: "192.168.1.150", created_at: ago(35 * MIN) },
-    { ...base, id: "a4", device_id: "d2", alert_type: "open_port", severity: "medium", title: "Port 3389 (RDP) open on desktop-pc", description: "Remote Desktop is reachable on 192.168.1.100. Disable it or limit it to trusted hosts.", status: "acknowledged", source_ip: "192.168.1.100", created_at: ago(5 * HOUR) },
-    { ...base, id: "a5", device_id: "d4", alert_type: "traffic_spike", severity: "low", title: "Traffic spike from living-room-tv", description: "Outbound traffic from 192.168.1.102 was 6 times its hourly average.", status: "open", source_ip: "192.168.1.102", created_at: ago(9 * HOUR) },
-    { id: "a6", device_id: "d5", alert_type: "open_port", severity: "low", title: "Port 445 (SMB) open on nas", description: "SMB is reachable on 192.168.1.110. It is expected for a file server on the local network.", status: "resolved", source_ip: "192.168.1.110", resolved_at: ago(20 * HOUR), created_at: ago(26 * HOUR) },
+    { ...base, id: "a1", device_id: "d6", alert_type: "suspicious_port", severity: "high", title: "Suspicious port connection: 185.220.101.4:4444", description: "Device 192.168.1.150 connected to suspicious port 4444 on 185.220.101.4", status: "open", source_ip: "192.168.1.150", created_at: ago(6 * MIN) },
+    { ...base, id: "a2", device_id: "d6", alert_type: "new_device", severity: "medium", title: "New device discovered: 192.168.1.150", description: "A new device was found on the network. IP: 192.168.1.150, MAC: 3E:91:0A:7B:66:06, Hostname: N/A", status: "open", source_ip: "192.168.1.150", created_at: ago(40 * MIN) },
+    { ...base, id: "a3", device_id: "d6", alert_type: "watchlist_country", severity: "medium", title: "Connection to watchlist country: Russia", description: "Device 192.168.1.150 communicated with 95.213.4.18 in Russia (Saint Petersburg)", status: "open", source_ip: "192.168.1.150", created_at: ago(35 * MIN) },
+    { ...base, id: "a4", device_id: "d2", alert_type: "open_port", severity: "high", title: "Suspicious ports open on 192.168.1.100", description: "Potentially risky ports detected: 3389 on device desktop-pc", status: "acknowledged", source_ip: "192.168.1.100", created_at: ago(5 * HOUR) },
+    { ...base, id: "a5", device_id: "d4", alert_type: "traffic_spike", severity: "medium", title: "High traffic volume from 192.168.1.102", description: "Device 192.168.1.102 generated 1184 connections and 812400000 bytes in the last hour", status: "open", source_ip: "192.168.1.102", created_at: ago(9 * HOUR) },
+    { id: "a6", device_id: "d5", alert_type: "open_port", severity: "high", title: "Suspicious ports open on 192.168.1.110", description: "Potentially risky ports detected: 445 on device nas", status: "resolved", source_ip: "192.168.1.110", resolved_at: ago(20 * HOUR), created_at: ago(26 * HOUR) },
   ];
 }
 

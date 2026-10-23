@@ -27,7 +27,7 @@ test("trusting a device updates the table", async ({ page }) => {
 
 test("acknowledging and resolving an alert updates its status", async ({ page }) => {
   await openPage(page, "/alerts/");
-  const title = "New unknown device: 192.168.1.150";
+  const title = "New device discovered: 192.168.1.150";
 
   await page.getByRole("button", { name: `Acknowledge: ${title}` }).click();
   await expect(page.getByRole("listitem").filter({ hasText: title })).toContainText("Acknowledged");
