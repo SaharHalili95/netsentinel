@@ -19,7 +19,8 @@ for (const lang of ["en", "he"] as const) {
   });
 }
 
-test("the skip link moves focus to the main content", async ({ page }) => {
+test("the skip link moves focus to the main content", async ({ page, browserName }) => {
+  test.skip(browserName === "webkit", "Safari only tabs to links with Option+Tab by default");
   await openPage(page, "/");
 
   await page.keyboard.press("Tab");
