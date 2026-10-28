@@ -40,6 +40,7 @@ def arp_scan(network: str | None = None) -> list[dict]:
 
 
 def parse_hosts_xml(xml_output: str) -> list[dict]:
+    """Extract hosts from nmap's -oX output. Only top-level <host> elements count, not <hosthint>."""
     try:
         root = ET.fromstring(xml_output)
     except ET.ParseError:

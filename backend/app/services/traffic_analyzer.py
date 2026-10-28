@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 async def capture_traffic_sample(db: AsyncSession) -> list[TrafficLog]:
+    """Capture a sample of network traffic. Uses mock data when scapy is unavailable."""
     try:
         return await _capture_with_scapy(db)
     except Exception as e:

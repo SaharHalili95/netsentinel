@@ -35,6 +35,7 @@ def scan_ports(ip_address: str, ports: str | None = None) -> dict:
 
 
 def parse_nmap_xml(xml_output: str) -> dict:
+    """Extract open ports from nmap's -oX output, regardless of attribute order."""
     open_ports = {}
     try:
         root = ET.fromstring(xml_output)
