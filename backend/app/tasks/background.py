@@ -30,7 +30,6 @@ def _alert_message(alert) -> dict:
 
 
 async def scheduled_discovery():
-    """Background job: discover devices on the network."""
     logger.info("Running scheduled device discovery...")
     async with async_session() as db:
         try:
@@ -42,7 +41,6 @@ async def scheduled_discovery():
 
 
 async def scheduled_port_scan():
-    """Background job: scan ports on known devices."""
     logger.info("Running scheduled port scan...")
     async with async_session() as db:
         try:
@@ -54,7 +52,6 @@ async def scheduled_port_scan():
 
 
 async def scheduled_traffic_capture():
-    """Background job: capture and analyze network traffic."""
     logger.info("Running scheduled traffic capture...")
     async with async_session() as db:
         try:
@@ -65,7 +62,6 @@ async def scheduled_traffic_capture():
 
 
 async def scheduled_anomaly_check():
-    """Background job: check for anomalies in recent traffic."""
     logger.info("Running scheduled anomaly detection...")
     async with async_session() as db:
         try:

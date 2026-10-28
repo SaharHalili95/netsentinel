@@ -14,7 +14,6 @@ router = APIRouter()
 
 @router.get("/summary", response_model=TrafficSummary)
 async def traffic_summary(hours: int = Query(24, ge=1, le=168), db: AsyncSession = Depends(get_db)):
-    """Protocols, top destinations, countries, suspicious connections and hourly volume."""
     now = datetime.now(timezone.utc)
     result = await db.execute(select(TrafficLog).where(TrafficLog.created_at >= now - timedelta(hours=hours)))
     return summarize_traffic(result.scalars().all(), now, hours)

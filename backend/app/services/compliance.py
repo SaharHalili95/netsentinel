@@ -46,7 +46,6 @@ async def get_daily_status(db: AsyncSession, check_date: date) -> DailyComplianc
 
 
 async def get_history(db: AsyncSession, days: int = 30) -> list[dict]:
-    """Return daily compliance scores for the last N days."""
     result = await db.execute(
         select(SOC2DailyCheck.check_date, SOC2DailyCheck.status)
         .order_by(SOC2DailyCheck.check_date.desc())

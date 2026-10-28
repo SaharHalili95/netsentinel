@@ -54,7 +54,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 async def broadcast_alert(alert_data: dict):
-    """Broadcast a new alert to all connected WebSocket clients."""
     await manager.broadcast({
         "type": "alert",
         "data": alert_data,
@@ -62,7 +61,6 @@ async def broadcast_alert(alert_data: dict):
 
 
 async def broadcast_scan_update(scan_data: dict):
-    """Broadcast scan progress to all connected WebSocket clients."""
     await manager.broadcast({
         "type": "scan_update",
         "data": scan_data,
@@ -70,7 +68,6 @@ async def broadcast_scan_update(scan_data: dict):
 
 
 async def broadcast_device_update(device_data: dict):
-    """Broadcast device status changes to all connected WebSocket clients."""
     await manager.broadcast({
         "type": "device_update",
         "data": device_data,

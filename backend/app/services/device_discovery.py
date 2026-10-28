@@ -12,7 +12,6 @@ def get_local_network() -> str:
 
 
 def arp_scan(network: str | None = None) -> list[dict]:
-    """Discover devices on the network using ARP scan via nmap."""
     target = network or get_local_network()
     devices = []
 
@@ -41,7 +40,6 @@ def arp_scan(network: str | None = None) -> list[dict]:
 
 
 def parse_hosts_xml(xml_output: str) -> list[dict]:
-    """Extract hosts from nmap's -oX output. Only top-level <host> elements count, not <hosthint>."""
     try:
         root = ET.fromstring(xml_output)
     except ET.ParseError:
@@ -72,7 +70,6 @@ def parse_hosts_xml(xml_output: str) -> list[dict]:
 
 
 def _mock_devices() -> list[dict]:
-    """Return mock devices for development without nmap."""
     return [
         {
             "ip_address": "192.168.1.1",

@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 async def run_discovery_scan(db: AsyncSession, network: str | None = None) -> Scan:
-    """Run a device discovery scan on the network."""
     target = network or settings.scan_network
     start_time = time.time()
 
@@ -116,7 +115,6 @@ async def run_discovery_scan(db: AsyncSession, network: str | None = None) -> Sc
 
 
 async def run_port_scan(db: AsyncSession) -> Scan:
-    """Run port scan on all known online devices."""
     start_time = time.time()
 
     scan = Scan(

@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 async def capture_traffic_sample(db: AsyncSession) -> list[TrafficLog]:
-    """Capture a sample of network traffic. Uses mock data when scapy is unavailable."""
     try:
         return await _capture_with_scapy(db)
     except Exception as e:
@@ -20,7 +19,6 @@ async def capture_traffic_sample(db: AsyncSession) -> list[TrafficLog]:
 
 
 async def _capture_with_scapy(db: AsyncSession) -> list[TrafficLog]:
-    """Capture real traffic using scapy."""
     from scapy.all import sniff, IP, TCP, UDP
 
     logs = []
@@ -63,7 +61,6 @@ async def _capture_with_scapy(db: AsyncSession) -> list[TrafficLog]:
 
 
 async def _mock_traffic_capture(db: AsyncSession) -> list[TrafficLog]:
-    """Generate mock traffic data for development."""
     mock_entries = [
         ("192.168.1.100", "8.8.8.8", 443, "TCP", "United States", "Mountain View", 37.386, -122.084),
         ("192.168.1.100", "151.101.1.140", 443, "TCP", "United States", "San Francisco", 37.774, -122.419),

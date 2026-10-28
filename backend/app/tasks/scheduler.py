@@ -10,7 +10,6 @@ scheduler = AsyncIOScheduler()
 
 
 def start_scheduler():
-    """Start the background task scheduler."""
     # Device discovery every 5 minutes
     scheduler.add_job(scheduled_discovery, "interval", minutes=5, id="discovery", replace_existing=True)
 
@@ -28,7 +27,6 @@ def start_scheduler():
 
 
 def stop_scheduler():
-    """Stop the background task scheduler."""
     if scheduler.running:
         scheduler.shutdown()
         logger.info("Scheduler stopped")

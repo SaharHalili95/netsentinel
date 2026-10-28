@@ -8,7 +8,6 @@ COMMON_PORTS = "21,22,23,25,53,80,110,135,139,143,443,445,993,995,1433,1521,3306
 
 
 def scan_ports(ip_address: str, ports: str | None = None) -> dict:
-    """Scan ports on a specific IP using nmap."""
     target_ports = ports or COMMON_PORTS
     open_ports = {}
 
@@ -36,7 +35,6 @@ def scan_ports(ip_address: str, ports: str | None = None) -> dict:
 
 
 def parse_nmap_xml(xml_output: str) -> dict:
-    """Extract open ports from nmap's -oX output, regardless of attribute order."""
     open_ports = {}
     try:
         root = ET.fromstring(xml_output)
@@ -60,7 +58,6 @@ def parse_nmap_xml(xml_output: str) -> dict:
 
 
 def _mock_ports(ip_address: str) -> dict:
-    """Return mock port data for development."""
     if ip_address.endswith(".1"):
         return {
             "80": {"protocol": "tcp", "service": "http", "product": "nginx", "version": "1.24", "state": "open"},
