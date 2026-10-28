@@ -15,7 +15,6 @@ TOP_DESTINATIONS = 10
 
 
 def summarize_traffic(logs: Sequence, now: datetime, hours: int = 24) -> TrafficSummary:
-    """Aggregate traffic log rows from the last `hours` hours for the traffic page."""
     newest_hour = now.replace(minute=0, second=0, microsecond=0)
     buckets = {
         newest_hour - timedelta(hours=i): {"inbound": 0, "outbound": 0, "suspicious": 0}

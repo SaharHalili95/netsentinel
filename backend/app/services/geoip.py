@@ -36,7 +36,6 @@ def is_private_ip(ip: str) -> bool:
 
 
 def lookup(ip: str) -> dict | None:
-    """Look up geographic information for an IP address."""
     if is_private_ip(ip):
         return None
 
@@ -58,7 +57,6 @@ def lookup(ip: str) -> dict | None:
 
 
 def _mock_lookup(ip: str) -> dict | None:
-    """Mock GeoIP data for development."""
     mock_data = {
         "8.8.8.8": {"country": "United States", "city": "Mountain View", "latitude": 37.386, "longitude": -122.084, "iso_code": "US"},
         "1.1.1.1": {"country": "Australia", "city": "Sydney", "latitude": -33.868, "longitude": 151.207, "iso_code": "AU"},

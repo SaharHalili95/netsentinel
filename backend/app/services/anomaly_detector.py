@@ -16,7 +16,6 @@ WATCHLIST_COUNTRIES = {"Russia", "China", "North Korea", "Iran"}
 
 
 async def analyze_traffic_anomalies(db: AsyncSession) -> list[Alert]:
-    """Analyze recent traffic for anomalies and generate alerts."""
     alerts = []
     now = datetime.now(timezone.utc)
     one_hour_ago = now - timedelta(hours=1)

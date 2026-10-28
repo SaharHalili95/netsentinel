@@ -469,7 +469,6 @@ def _build_alerts(devices: list[dict]) -> list[dict]:
 
 
 def _build_timeline() -> list[dict]:
-    """Last 24 hours of traffic data (hourly buckets)."""
     now = datetime.now(timezone.utc)
     points = []
     for h in range(23, -1, -1):
@@ -602,7 +601,6 @@ async def demo_scan(count: int = 8):
 
 @router.get("/status")
 async def demo_status():
-    """Quick health check that the demo backend is live."""
     return {
         "status":    "live",
         "timestamp": datetime.now(timezone.utc).isoformat(),

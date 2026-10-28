@@ -11,7 +11,6 @@ router = APIRouter()
 
 @router.get("")
 async def get_dashboard(db: AsyncSession = Depends(get_db)):
-    """Get aggregated dashboard statistics."""
     # Device stats
     total_devices = await db.scalar(select(func.count()).select_from(Device))
     online_devices = await db.scalar(select(func.count()).select_from(Device).where(Device.is_online == True))
