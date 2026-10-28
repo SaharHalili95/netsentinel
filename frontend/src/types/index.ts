@@ -101,3 +101,56 @@ export interface DashboardData {
     created_at: string;
   }[];
 }
+
+export interface TrafficSummary {
+  window_hours: number;
+  total_bytes: number;
+  protocols: { protocol: string; connections: number }[];
+  top_destinations: { ip: string; country: string | null; city: string | null; bytes: number; connections: number }[];
+  countries: { country: string; connections: number; bytes: number }[];
+  suspicious: {
+    destination_ip: string;
+    destination_port: number | null;
+    country: string | null;
+    city: string | null;
+    bytes: number;
+    connections: number;
+  }[];
+  hourly: { hour: string; inbound_bytes: number; outbound_bytes: number; suspicious: number }[];
+}
+
+export interface ComplianceCheck {
+  id: string;
+  check_date: string;
+  check_type: string;
+  criteria: string;
+  status: "pass" | "fail" | "na";
+  notes: string | null;
+  evidence_ref: string | null;
+  checked_by: string;
+  created_at: string;
+}
+
+export interface ComplianceStatus {
+  check_date: string;
+  total_checks: number;
+  passed: number;
+  failed: number;
+  missing: number;
+  score_pct: number;
+  checks: ComplianceCheck[];
+  missing_checks: string[];
+}
+
+export interface RequiredCheck {
+  check_type: string;
+  criteria: string;
+  description: string;
+}
+
+export interface ComplianceHistoryDay {
+  date: string;
+  score_pct: number;
+  passed: number;
+  total: number;
+}

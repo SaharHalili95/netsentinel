@@ -1,149 +1,105 @@
 "use client";
 
-import { useState } from "react";
-import { Save, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
+import Ltr from "@/components/ui/Ltr";
+import { useI18n } from "@/lib/i18n/I18nProvider";
+import { loadPrefs, savePrefs, type Prefs } from "@/lib/prefs";
+import type { Locale } from "@/lib/utils";
+
+// Mirrors backend/app/config.py and backend/app/tasks/scheduler.py.
+const SERVER_SETTINGS = { network: "192.168.1.0/24", discovery: 5, portScan: 60, capture: 2 };
+
+const RULES = ["ruleNewDevice", "rulePort", "ruleCountry", "ruleSpike"];
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState({
-    scanNetwork: "192.168.1.0/24",
-    discoveryInterval: 5,
-    portScanInterval: 60,
-    trafficCapture: true,
-    alertOnNewDevice: true,
-    alertOnSuspiciousPort: true,
-    alertOnWatchlistCountry: true,
-    alertOnTrafficSpike: true,
-    notifyEmail: "",
-    darkMode: true,
-  });
+  const { t, locale, setLocale } = useI18n();
+  const [prefs, setPrefs] = useState<Prefs>({ reduceMotion: false });
 
-  const [saved, setSaved] = useState(false);
+  useEffect(() => setPrefs(loadPrefs()), []);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const updatePrefs = (next: Prefs) => {
+    setPrefs(next);
+    savePrefs(next);
   };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground">
-          Configure scanning, alerts, and notification preferences
-        </p>
-      </div>
+      <PageHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
 
-      {/* Network Scanning */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-foreground">Network Scanning</h3>
+      <section aria-labelledby="display" className="space-y-4 rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between gap-2">
+          <h2 id="display" className="text-sm font-semibold text-foreground">{t("settings.display")}</h2>
+          <span className="text-xs text-muted-foreground">{t("settings.savedLocally")}</span>
+        </div>
 
         <div>
-          <label className="block text-sm text-muted-foreground mb-1">Target Network (CIDR)</label>
-          <input
-            type="text"
-            value={settings.scanNetwork}
-            onChange={(e) => setSettings({ ...settings, scanNetwork: e.target.value })}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          />
+          <label htmlFor="language" className="mb-1 block text-sm text-muted-foreground">{t("settings.language")}</label>
+          <select
+            id="language"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+          >
+            <option value="en">English</option>
+            <option value="he">עברית</option>
+          </select>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm text-muted-foreground mb-1">Discovery Interval (min)</label>
-            <input
-              type="number"
-              value={settings.discoveryInterval}
-              onChange={(e) => setSettings({ ...settings, discoveryInterval: Number(e.target.value) })}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-muted-foreground mb-1">Port Scan Interval (min)</label>
-            <input
-              type="number"
-              value={settings.portScanInterval}
-              onChange={(e) => setSettings({ ...settings, portScanInterval: Number(e.target.value) })}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-        </div>
-
-        <label className="flex items-center gap-3 cursor-pointer">
+        <div className="flex items-start gap-3">
           <input
+            id="reduce-motion"
             type="checkbox"
-            checked={settings.trafficCapture}
-            onChange={(e) => setSettings({ ...settings, trafficCapture: e.target.checked })}
-            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
+            checked={prefs.reduceMotion}
+            onChange={(e) => updatePrefs({ ...prefs, reduceMotion: e.target.checked })}
+            aria-describedby="reduce-motion-hint"
+            className="mt-0.5 h-4 w-4 rounded border-border bg-background accent-[hsl(var(--primary))]"
           />
-          <span className="text-sm text-foreground">Enable traffic capture</span>
-        </label>
-      </div>
-
-      {/* Alert Settings */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-foreground">Alert Rules</h3>
-
-        {[
-          { key: "alertOnNewDevice" as const, label: "Alert on new device discovery" },
-          { key: "alertOnSuspiciousPort" as const, label: "Alert on suspicious port detection" },
-          { key: "alertOnWatchlistCountry" as const, label: "Alert on watchlist country connections" },
-          { key: "alertOnTrafficSpike" as const, label: "Alert on traffic volume spikes" },
-        ].map((rule) => (
-          <label key={rule.key} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings[rule.key]}
-              onChange={(e) => setSettings({ ...settings, [rule.key]: e.target.checked })}
-              className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
-            />
-            <span className="text-sm text-foreground">{rule.label}</span>
-          </label>
-        ))}
-      </div>
-
-      {/* Notifications */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-        <div>
-          <label className="block text-sm text-muted-foreground mb-1">Email for alerts (optional)</label>
-          <input
-            type="email"
-            value={settings.notifyEmail}
-            onChange={(e) => setSettings({ ...settings, notifyEmail: e.target.value })}
-            placeholder="your@email.com"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          />
+          <div>
+            <label htmlFor="reduce-motion" className="text-sm text-foreground">{t("settings.reduceMotion")}</label>
+            <p id="reduce-motion-hint" className="text-xs text-muted-foreground">{t("settings.reduceMotionHint")}</p>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Actions */}
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          <Save className="h-4 w-4" />
-          {saved ? "Saved!" : "Save Settings"}
-        </button>
-        <button
-          onClick={() => setSettings({
-            scanNetwork: "192.168.1.0/24",
-            discoveryInterval: 5,
-            portScanInterval: 60,
-            trafficCapture: true,
-            alertOnNewDevice: true,
-            alertOnSuspiciousPort: true,
-            alertOnWatchlistCountry: true,
-            alertOnTrafficSpike: true,
-            notifyEmail: "",
-            darkMode: true,
-          })}
-          className="flex items-center gap-2 rounded-lg border border-border px-6 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent transition-colors"
-        >
-          <RotateCcw className="h-4 w-4" />
-          Reset to Default
-        </button>
-      </div>
+      <section aria-labelledby="scanning" className="space-y-4 rounded-xl border border-border bg-card p-5">
+        <h2 id="scanning" className="text-sm font-semibold text-foreground">{t("settings.scanning")}</h2>
+        <p className="text-xs text-muted-foreground">{t("settings.serverNote")}</p>
+        <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <dt className="text-muted-foreground">{t("settings.network")}</dt>
+            <dd className="text-foreground"><Ltr>{SERVER_SETTINGS.network}</Ltr></dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{t("settings.discoveryInterval")}</dt>
+            <dd className="text-foreground">{t("settings.everyMinutes", { n: SERVER_SETTINGS.discovery })}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{t("settings.portScanInterval")}</dt>
+            <dd className="text-foreground">{t("settings.everyMinutes", { n: SERVER_SETTINGS.portScan })}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{t("settings.captureInterval")}</dt>
+            <dd className="text-foreground">{t("settings.everyMinutes", { n: SERVER_SETTINGS.capture })}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="rules" className="space-y-3 rounded-xl border border-border bg-card p-5">
+        <h2 id="rules" className="text-sm font-semibold text-foreground">{t("settings.rules")}</h2>
+        <ul className="space-y-2">
+          {RULES.map((rule) => (
+            <li key={rule} className="flex items-center justify-between gap-3 text-sm">
+              <span className="text-foreground">{t(`settings.${rule}`)}</span>
+              <span className="flex items-center gap-1 text-xs text-green-400">
+                <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                {t("settings.enabled")}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

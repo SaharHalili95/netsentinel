@@ -8,14 +8,16 @@ interface WSMessage {
   timestamp?: string;
 }
 
-export function useWebSocket(url?: string) {
-  const wsUrl = url || process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+// Pass null to stay disconnected (the demo build has no server).
+export function useWebSocket(url?: string | null) {
+  const wsUrl = url === null ? null : url || process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
   const wsRef = useRef<WebSocket | null>(null);
   const [lastMessage, setLastMessage] = useState<WSMessage | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const connect = useCallback(() => {
+    if (!wsUrl) return;
     try {
       const ws = new WebSocket(`${wsUrl}/api/ws/live`);
 
