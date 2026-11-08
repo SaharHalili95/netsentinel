@@ -111,6 +111,10 @@ cd frontend && npm test && npx playwright test
 | GET | `/api/compliance/status`, `/history`, `/checks/required`, `/criteria` | SOC 2 daily checks |
 | WS | `/api/ws/live` | New alerts from the traffic rules and finished scheduled scans |
 
+## Legal use
+
+Only scan networks you own or have clear permission to test. Scanning someone else's network without permission can be illegal. GeoIP lookups are optional and use MaxMind's GeoLite2 database, which is not included here. If you use it, follow MaxMind's license and attribution terms.
+
 ## License
 
 MIT
