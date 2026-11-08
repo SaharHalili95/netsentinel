@@ -26,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
       <body className={inter.className}>
         <AppShell>{children}</AppShell>
+        <footer dir="ltr" style={{ position: "relative", zIndex: 1, padding: "10px 16px", textAlign: "center", font: "12px/1.5 system-ui, sans-serif", color: "#94a3b8" }}>© 2026 Sahar Halili</footer>
       </body>
     </html>
   );
